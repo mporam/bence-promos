@@ -1,0 +1,125 @@
+<?php
+require __DIR__ . '/inc/db_conn.inc';
+require __DIR__ . '/inc/header.inc';
+
+$query = $con->prepare("SELECT * FROM users");
+$query->execute();
+
+$users = $query->fetchAll(PDO::FETCH_ASSOC);
+
+$i = 0;
+$yes = 0;
+$no = 0;
+$total = 0;
+?>
+    <main class="shadow container">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+
+            <input id="searchInput" value="Filter Results"> <i>(Tip: Type "No" to see who isn't activated or <a href="#view-stats">View Stats</a>!)</i>
+        </div>
+        <div class="col-xs-12">
+            <table class="table" id="users">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Activated</th>
+                </tr>
+                </thead>
+                <tbody id="fbody">
+                <?php foreach ($users as $user) {
+                    if (empty($user['access'])) $user['access'] = 1;
+                    ?>
+                    <tr data-access="<?php echo $user['access']; ?>">
+                        <td>
+                            <a href="/account?uid=<?php echo $user['id']; ?>"><?php echo $user['name']; ?></a>
+                        </td>
+                        <td>
+                            <?php echo $user['company']; ?>
+                        </td>
+                        <td>
+                            <a href="mailto:<?php echo $user['email']; ?>"><?php echo $user['email']; ?></a>
+                        </td>
+                        <td>
+                            <?php echo $user['phone']; ?>
+                        </td>
+                        <?php if ($user['password'] == null) { ?>
+                            <td class="inactive cell">
+                                No
+                            </td>
+
+                            <?php $no++;
+                        } else { ?>
+                            <td class="activated cell">
+                                Yes
+                            </td>
+
+                            <?php
+                            $yes++;
+                        }
+
+                        $participation = ($i / 100) * $yes;
+                        ?>
+
+                        <!--<td data-region="<?php //echo $user['r_id']; ?>"><?php //echo $user['r_name']; ?></td>-->
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-xs-12" id="view-stats">
+            <h2>Stats</h2>
+            <p><?php echo "<strong>" . $yes . "</strong> people have activated and <strong>" . $no . "</strong> have not. Out of <strong>" . $i . "</strong> participants."; ?></p>
+        </div>
+
+
+        <script>
+            $("#searchInput").keyup(function () {
+                //split the current value of searchInput
+                var data = this.value.split(" ");
+                //create a jquery object of the rows
+                var jo = $("#fbody").find("tr");
+                if (this.value == "") {
+                    jo.show();
+                    return;
+                }
+                //hide all the rows
+                jo.hide();
+
+                //Recusively filter the jquery object to get results.
+                jo.filter(function (i, v) {
+                    var $t = $(this);
+                    for (var d = 0; d < data.length; ++d) {
+                        if ($t.is(":contains('" + data[ d ] + "')")) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                //show the rows that match.
+                    .show();
+            }).focus(function () {
+                this.value = "";
+                $(this).css({
+                    "color": "black"
+                });
+                $(this).unbind('focus');
+            }).css({
+                "color": "#C0C0C0"
+            });
+
+        </script>
+
+    </main>
+
+<?php
+require __DIR__ . '/inc/footer.inc';

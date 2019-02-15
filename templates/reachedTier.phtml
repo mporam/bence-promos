@@ -1,0 +1,46 @@
+<?php
+require __DIR__ . '/inc/header.inc';
+
+$user = $data['user'];
+?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+        <?php
+        if ($_SESSION['access'] > 1 && $user['access'] != 1) { ?>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Users who reached tier <?php echo $data['tid']; ?></th>
+                    </tr>
+                    </thead>
+                    <?php
+                    if (!empty($data['users'])) {
+                        foreach ($data['users'] as $user) {
+							if (!empty($user['name'])) {
+                            	echo "<tr><td><a href='/account/?uid=" . $user['id'] . "'>" . $user['name'] . " - " . $user['company'] . "</a></td></tr>";
+							}
+                        }
+                    } ?>
+                </table>
+                <?php
+                if (empty($data['users'])) {
+                    echo '<p>No users have reached this tier yet.</p>';
+                }
+			} ?>
+		</div>
+    </div>
+
+ 
+
+
+</main>
+
+<?php require __DIR__ . '/inc/footer.inc'; ?>

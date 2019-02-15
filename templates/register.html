@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bence Template</title>
+    <link type="text/css" rel="stylesheet" href="../public/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../public/css/jquery.circliful.css"/>
+    <link type="text/css" rel="stylesheet" href="../public/css/style.css"/>
+    <link href='https://fonts.googleapis.com/css?family=PT+Sans+Narrow:700,400|Roboto:300' rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="../public/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../public/js/jquery.circliful.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+
+            $("#test-circle").circliful({
+                animationStep: 5,
+                foregroundBorderWidth: 10,
+                backgroundBorderWidth: 10,
+                percent: 82,
+                foregroundColor: '#9A1A31'
+            });
+
+            $("#test-circle-2").circliful({
+                animationStep: 5,
+                foregroundBorderWidth: 10,
+                backgroundBorderWidth: 10,
+                percent: 23,
+                foregroundColor: '#9A1A31'
+            });
+        });
+    </script>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div id="logo" class="col-md-6">
+            <h1>Bence
+                <small>Rewards</small>
+            </h1>
+        </div>
+        <div class="col-md-6">
+            <div class="contact">
+                <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span> 078875 98721 <span class="glyphicon glyphicon-envelope"></span> adrian@michelangelo.cat
+            </div>
+            <div class="action">
+                Login
+            </div>
+        </div>
+    </div>
+</header>
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="bottom-border">
+                Breadcrumbs
+                <div class="pull-right">< Back</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Form Elements</h2>
+        </div>
+        <form>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email address *:</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email address *:</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </form>
+        <div class="col-xs-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Col 1</th>
+                        <th>Col 2</th>
+                        <th>Col 3</th>
+                        <th>Col 4</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#</td>
+                        <td>Example</td>
+                        <td>Example</td>
+                        <td>Example</td>
+                    </tr>
+                    <tr>
+                        <td>#</td>
+                        <td>Example</td>
+                        <td>Example</td>
+                        <td>Example</td>
+                    </tr>
+                    <tr>
+                        <td>#</td>
+                        <td>Example</td>
+                        <td>Example</td>
+                        <td>Example</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="dropdown">Dropdown Label</label>
+                <select class="form-control" id="dropdown">
+                    <option>Select a value</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <h3>Stats</h3>
+        </div>
+        <div class="col-md-6">
+            <div id="test-circle" class="stat"></div>
+            <div id="test-circle-2" class="stat"></div>
+        </div>
+        <div class="col-md-6">
+            <b>28</b> customers have completed gold tier and <b>20</b> customers have completed silver teir out of <b>100</b> customers overall.
+        </div>
+    </div>
+</main>
+<footer>
+    <div class="container">
+        <div class="col-xs-12">
+            <nav class="slightly-centred-div">
+                <a href="#">SiteMap</a>|<a href="#">Contact Us</a>
+            </nav>
+            <div class="slightly-centred-div metadata">
+                &copy; Bencelating
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

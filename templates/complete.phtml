@@ -1,0 +1,50 @@
+<?php
+require __DIR__ . '/inc/notifications.inc';
+require __DIR__ . '/inc/header.inc';
+
+//if ($_SESSION['access'] !== 5) {
+//    header('Location: /account/');
+//    exit;
+//}
+
+if (empty($_SESSION['notifications'])) {
+    header('Location: /account/');
+    exit;
+}
+?>
+
+        <main class="shadow container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+                </div>
+            </div>
+            <h4>Message sent:</h4>
+            <?php echo $_SESSION['notificationMessage']; ?>
+
+            <h4>Successfully sent to:</h4>
+            <ul>
+                <?php foreach($_SESSION['notifications']['success'] as $user) {
+                    echo "<li>" . $user . "</li>";
+                } ?>
+            </ul>
+
+
+            <h4>Failed to send to:</h4>
+            <ul>
+                <?php foreach($_SESSION['notifications']['fail'] as $user) {
+                    echo "<li>" . $user . "</li>";
+                } ?>
+            </ul>
+
+            <a href="/account/notifications">Return to notification centre</a>
+
+            <p>&nbsp;</p>
+
+        </main>
+
+<?php
+require __DIR__ . '/inc/footer.inc';
+
+unset($_SESSION['notificationMessage']);
+unset($_SESSION['notifications']);

@@ -1,0 +1,29 @@
+<?php require __DIR__ . '/../inc/header.inc'; ?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/../inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h2><?php echo $data['breadcrumbs']['tier']; ?></h2>
+        </div>
+    </div>
+    <?php foreach ($data['promos'] as $promo) { ?>
+        <div class="row">
+            <div class="col-md-8 col-sm-7 col-xs-12">
+                <h3><?php echo $promo['title']; ?></h3>
+                <p><?php echo $promo['desc']; ?></p>
+            </div>
+            <div class="col-md-4 col-sm-5 col-xs-12">
+                <br>
+                <img src="<?php echo $promo['image1']; ?>" width="250">
+            </div>
+        </div>
+    <?php } ?>
+    </div>
+</main>
+
+<?php require __DIR__ . '/../inc/footer.inc'; ?>

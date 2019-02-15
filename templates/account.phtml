@@ -1,0 +1,299 @@
+<?php
+require __DIR__ . '/inc/header.inc';
+
+$user = $data['user'];
+?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Welcome, <?php echo $_SESSION['name'] ?>!</h2>
+
+            <?php if (isset($data['selectedPromo']) && is_array($data['selectedPromo'])) {
+                echo "<p><strong>" . $data['selectedPromo']['title'] . " booked.</strong></p>";
+            } else if (isset($data['selectedPromo'])) {
+                echo "<p>Booking failed, please <a href='/account/promotions/" . $data['selectedPromo'] . "'>try again</a>.</p>";
+            } ?>
+
+            <?php if ($_SESSION['id'] !== $user['id']) {
+                echo "<p>You are viewing " . $user['name'] . "'s profile logged in as " . $_SESSION['name'] . ".</p>";
+            } ?>
+
+            <?php
+            if ($data['user']['access'] == 1) {
+            ?>
+            <p>Welcome to the Bence Loyalty Scheme 2018!
+                <br>
+                <br>
+                In this promotion you have been set obtainable targets over a nine month period, from March to the end of November. Your Ex Yard Sales, including Obsidian, Bence Roofing, Bence Building Supplies and Bence Decorating sales, will be tracked throughout the whole promotion period and you will be updated every month via email on what you have spent.
+                Furthermore, any figures that are displayed on your account pages on the website and in any email communications will be excluding VAT. Once your target spend has been achieved, you will have a choice of selecting one reward from the choices that are available to you. Only one reward can be chosen and if a target spend has been achieved within the nine month period, the reward can be exercised at that point. All rewards must be claimed with the Bence Rewards team by 31st March 2018.		
+                <br>
+                <br>
+                If you have any queries on any aspect of the promotion please do not hesitate to contact the Bence Rewards Team.
+                <br>
+                <br>
+                Tel: 0117 952 7741<br>
+                Email: <a href="mailto:info@bencerewards.co.uk">info@bencerewards.co.uk</a><br>
+                Website: <a href="http://www.bencerewards.co.uk">www.bencerewards.co.uk</a></p>
+            <?php } ?>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-xs-12">
+            <h4>Account Details
+                <?php if ($_SESSION['id'] == $user['id'] || $_SESSION['access'] > 1) { // only allow edit if your account or admin ?>
+                    <a href="/account/update"><span class="glyphicon glyphicon-pencil"></span></a>
+                <?php } ?>
+            </h4>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+            <div class="col-xs-4 account-details align-right">
+                Full Name
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['name'] ?: '--'); ?>
+            </div>
+            <div class="col-xs-4 account-details align-right">
+                Company Name
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['company'] ?: '--'); ?>
+            </div>
+            <div class="col-xs-4 account-details align-right">
+                Account Number
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['accNo'] ?: '--'); ?>
+            </div>
+            <div class="col-xs-4 account-details align-right">
+                Phone Number
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['phone'] ?: '--'); ?>
+            </div>
+            <div class="col-xs-4 account-details align-right">
+                Mobile Number
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['mobile'] ?: '--'); ?>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+            <div class="col-xs-4 account-details align-right">
+                Email address
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['email'] ?: '--'); ?>
+            </div>
+
+            <?php if (!empty($user['startDate']) && !empty($user['endDate'])) { ?>
+                <div class="col-xs-4 account-details align-right">
+                    Promotion dates
+                </div>
+                <div class="col-xs-8 account-details">
+                    <?php echo date('d/m/Y', strtotime($user['startDate'])) . ' - ' . date('d/m/Y', strtotime($user['endDate'])); ?>
+                </div>
+            <?php } ?>
+
+            <div class="col-xs-4 account-details align-right">
+                Address
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['address1'] ?: '--'); ?>
+                <?php echo '<div>' . $user['address2'] . '</div>'; ?>
+                <?php echo '<div>' . $user['address3'] . '</div>'; ?>
+                <?php echo '<div>' . $user['address4'] . '</div>'; ?>
+                <?php echo($user['postcode'] ?: '--'); ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <?php if ($_SESSION['access'] == 5) { ?>
+            <div class="col-xs-12 col-md-6">
+                <h4>Admin Tools</h4>
+                <div class="col-md-12">
+                    <ul>
+                        <li><a href="account/notifications">Notification Centre</a></li>
+                        <li><a href="account/users">View User List</a></li>
+                        <li><a href="account/import">Import Data</a></li>
+                    </ul>
+
+                </div>
+            </div>
+            <?php
+            $halfWidth = true;
+        }
+        if ($_SESSION['access'] > 1 && $user['access'] != 1) { ?>
+            <div class="col-xs-12 <?php echo !empty($halfWidth) ? "col-md-6" : ''; ?>">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Users</th>
+                    </tr>
+                    </thead>
+                    <?php
+                    if (!empty($data['users'])) {
+                        foreach ($data['users'] as $user) {
+							if (!empty($user['name'])) {
+                            	echo "<tr><td><a href='?uid=" . $user['id'] . "'>" . $user['name'] . " - " . $user['company'] . "</a></td></tr>";
+							}
+                        }
+                    } ?>
+                </table>
+                <?php
+                if (empty($data['users'])) {
+                    echo '<p>No users have been registered for 2018 yet, please check back later.</p>';
+                }
+                ?>
+            </div>
+        <?php } ?>
+    </div>
+
+    <div class="row">
+        <?php if (!empty($data['limits'])) { ?>
+            <div class="col-md-6 col-xs-12 title">
+                <h4>Targets</h4>
+            </div>
+            <div class="col-xs-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Target</th>
+                    </tr>
+                    </thead>
+                    <?php foreach ($data['limits'] as $key => $value) { ?>
+                        <tr>
+                            <th width="15%"><?php echo $key; ?></th>
+                            <td><?php echo '&pound;' . number_format($value, 2, '.', ','); ?></td>
+                        </tr>
+                    <?php } ?>
+                </table>
+            </div>
+        <?php } ?>
+    </div>
+
+
+    <?php if (!empty($data['expenses'])) { ?>
+        <div class="row">
+            <div class="col-xs-12 title">
+                <h4>Spend</h4>
+            </div>
+            <div class="col-xs-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Amount</th>
+                    </tr>
+                    </thead>
+                    <?php foreach ($data['expenses'] as $key => $value) { ?>
+                        <tr>
+                            <th width="15%"><?php echo $key; //$time = strtotime($key); echo date('F', $time); ?></th>
+                            <td><?php echo '&pound;' . number_format($value, 2, '.', ','); ?></td>
+                        </tr>
+                    <?php } ?>
+                </table>
+            </div>
+        </div>
+    <?php } ?>
+
+    <?php
+//	var_dump($data['tiers']);
+    if (!empty($data['promos'])) {
+        $tiers = $data['tiers'];
+        ?>
+        <div class="row">
+            <div class="col-xs-12 title" id="rewards">
+                <h4>Rewards</h4>
+            </div>
+
+            <?php
+            if (isset($data['chosenPromo']) && is_array($data['chosenPromo'])) {
+                echo "<div class='col-xs-12'>";
+                echo "<p><strong>" . $data['chosenPromo']['title'] . " booked.</strong></p>";
+                echo "</div>";
+            }
+
+            foreach ($data['promos'] as $tier => $promos) { ?>
+
+                <div class="col-xs-12">
+                    <h4><?php echo $tier; ?></h4>
+                </div>
+
+                <?php
+                foreach ($promos as $promo) {
+                    if (!empty($promo['title'])) { 
+//												var_dump($promo['tier']);
+						?>
+                        <div class="col-xs-12 col-md-4">
+                            <a href="<?php
+                            if (isset($tiers[$promo['tier']]) && $tiers[$promo['tier']] === 1) {
+								echo '/account/promotions/' . $promo['id'];
+                                if ($_SESSION['id'] !== $user['id']) {
+                                    echo "/?uid=" . $user['id'];
+                                }
+                            } else {
+                                echo "#rewards";
+                            } ?>">
+                                <div class="feature-box"
+                                     style="background-image: url('<?php echo $promo['thumb'] ?>');">
+                                    <?php
+                                    if (isset($tiers[$promo['tier']]) && $tiers[$promo['tier']] === 0) { ?>
+                                        <div class="glyph-house">
+                                            <span class='glyphicon glyphicon-lock'></span>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                    <h3><?php echo $promo['title']; ?></h3>
+                                </div>
+                            </a>
+                        </div>
+                    <?php }
+                }
+            } ?>
+        </div>
+    <?php } ?>
+
+    <?php if ($data['user']['access'] == 1 && !empty($data['yourstats'])) { ?>
+        <div class="row">
+            <div class="col-xs-12 title">
+                <h4>Your Stats</h4>
+            </div>
+            <?php
+            foreach($data['yourstats'] as $stat) {
+                echo '<div class="col-md-2 col-sm-4 col-xs-6">';
+                echo $stat;
+                echo '</div>';
+            }
+            ?>
+        </div>
+    <?php } ?>
+
+    <?php if ($_SESSION['access'] > 1) { ?>
+        <div class="row">
+            <div class="col-xs-12 title">
+                <h4>Performance Stats</h4>
+            </div>
+            <?php foreach ($data['stats']['circles'] as $stat) {
+                echo '<div class="col-md-2 col-sm-4 col-xs-6">';
+                echo $stat;
+                echo '</div>';
+            } ?>
+        </div>
+    <?php } ?>
+</main>
+
+<?php require __DIR__ . '/inc/footer.inc'; ?>

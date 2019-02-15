@@ -1,0 +1,53 @@
+<?php require __DIR__ . '/inc/header.inc'; ?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Password Reset</h2>
+            <?php
+            if (isset($data['user']) && $data['user'] == false) {
+                echo '<p class="text-danger">Invalid reset link. Please use the below form to reset your password.</p>';
+            }
+
+            if (isset($data['sent']) && $data['sent'] == true) {
+                echo '<p class="text-success">Your password reset email has been sent. Please close this page and click the link in your email.</p>';
+            }
+
+            if (isset($data['sent']) && $data['sent'] == false) {
+                echo '<p class="text-danger">There is no user registered with that email address. Please try again.</p>';
+            }
+
+            if (!empty($data['user'])) { ?>
+                <p>Use the below form to reset your password.</p>
+                <form action="/login/reset/?user=<?php echo $data['user']; ?>" method="POST">
+                    <div class="form-group">
+                        <label for="password">New Password:</label>
+                        <input type="password" name="password" class="form-control" id="password">
+                    </div>
+                    <button type="submit" class="btn btn-default">Change Password</button>
+                </form>
+            <?php } else { ?>
+                <form action="/login/reset" method="POST">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" name="email" class="form-control" id="email">
+                    </div>
+                    <button type="submit" class="btn btn-default">Send</button>
+                </form>
+            <?php } ?>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Still can't log in?</h2>
+            <p>If your still unable to log in to your account, please contact us at <a href="mailto:">info@bencerewards.co.uk</a>.
+            </p>
+        </div>
+    </div>
+</main>
+
+<?php require __DIR__ . '/inc/footer.inc'; ?>

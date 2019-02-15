@@ -1,0 +1,89 @@
+<?php require __DIR__ . '/inc/header.inc'; ?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Update your Account details</h2>
+            <?php if (isset($data['update'])) {
+                if ($data['update'] === 'incomplete') {
+                    echo '<p>Please fill out all required fields.</p>';
+                }
+
+                if ($data['update'] === true) {
+                    echo '<p>Account information successfully updated.</p>';
+                }
+            } ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <form action="/account/update" method="POST">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="accNo">Account No.:</label>
+                    <input type="text" name="accNo" class="form-control" readonly id="accNo" value="<?php echo $data['user']['accNo']; ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" name="name" class="form-control" id="name" value="<?php echo $data['user']['name']; ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Company Name:</label>
+                    <input type="text" name="company" class="form-control" id="company" value="<?php echo $data['user']['company']; ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" class="form-control" id="email" value="<?php echo $data['user']['email']; ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="text" name="phone" class="form-control" id="phone" value="<?php echo $data['user']['phone']; ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="mobile">Mobile:</label>
+                    <input type="text" name="mobile" class="form-control" id="mobile" value="<?php echo $data['user']['mobile']; ?>">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="address1">Address Line 1:</label>
+                    <input type="text" name="address1" class="form-control" id="address1" value="<?php echo $data['user']['address1']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="address2">Address Line 2:</label>
+                    <input type="text" name="address2" class="form-control" id="address2" value="<?php echo $data['user']['address2']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="address3">Address Line 3:</label>
+                    <input type="text" name="address3" class="form-control" id="address3" value="<?php echo $data['user']['address3']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="address4">Address Line 4:</label>
+                    <input type="text" name="address4" class="form-control" id="address4" value="<?php echo $data['user']['address4']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="postcode">Postcode:</label>
+                    <input type="text" name="postcode" class="form-control" id="postcode" value="<?php echo $data['user']['postcode']; ?>">
+                </div>
+            </div>
+
+            <div class="col-xs-12">
+                <button type="submit" class="btn btn-default">Update</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<?php require __DIR__ . '/inc/footer.inc'; ?>

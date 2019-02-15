@@ -1,0 +1,237 @@
+<?php
+require __DIR__ . '/inc/notifications.inc';
+require __DIR__ . '/inc/header.inc';
+require __DIR__ . '/../src/classes/PHPMailer.php';
+
+//if ($_SESSION['access'] !== 5) {
+//    header('Location: /account/');
+//    exit;
+//}
+
+if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
+    header('Location: /account/notifications/');
+    exit;
+}
+
+//require($_SERVER['DOCUMENT_ROOT'] . '/includes/class.phpmailer.php');
+
+$subject = $_POST['subject'];
+$message = $_POST['message'];
+$users = $_POST['users'];
+
+$sql = "SELECT *, users.accNo AS accNo
+  FROM users
+  LEFT JOIN regions ON users.region = regions.r_id
+  LEFT JOIN promotions2015 ON users.promo = promotions2015.id
+  LEFT JOIN limits2015 ON users.accNo = limits2015.accNo
+  WHERE users.id IN ($users)";
+
+$query = $con->prepare($sql);
+$query->execute();
+$users = $query->fetchAll(PDO::FETCH_ASSOC);
+
+$_SESSION['notifications']['success'] = array();
+$_SESSION['notifications']['fail'] = array();
+?>
+    <main class="shadow container">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+            </div>
+        </div>
+        <p>Sending...</p>
+        <p>If this page does not redirect in 60 seconds please <a href="complete.php">Click Here</a></p>
+    </main>
+<?php
+require __DIR__ . '/inc/footer.inc';
+
+foreach ($users as $user) {
+    $accNo = $user['accNo'];
+
+    $query = $con->prepare("SELECT * FROM expenses2015 WHERE accNo = '$accNo'");
+    $query->execute();
+    $user['expenses'] = $query->fetch(PDO::FETCH_ASSOC);
+		
+    $user['total'] = intval(array_sum($user['expenses']));
+
+    $user['total'] = (is_int($user['total']) && $user['total'] > 0 ? number_format($user['total'], 2, '.', ',') : '&pound0.00');
+
+    $user['t1limit'] = (empty($user['t1limit']) ? 'Not Defined' : number_format($user['t1limit'], 2, '.', ','));
+    $user['t2limit'] = (empty($user['t2limit']) ? 'Not Defined' : number_format($user['t2limit'], 2, '.', ','));
+    $user['t3limit'] = (empty($user['t3limit']) ? 'Not Defined' : number_format($user['t3limit'], 2, '.', ','));
+    $user['t4limit'] = (empty($user['t4limit']) ? 'Not Defined' : number_format($user['t4limit'], 2, '.', ','));
+    $user['t5limit'] = (empty($user['t5limit']) ? 'Not Defined' : number_format($user['t5limit'], 2, '.', ','));
+
+    if ($user['t1limit'] !== 'Not Defined') {
+        $user['t1remaining'] = ($user['total'] - $user['t1limit'] <= 0 ? 'Target Reached' : number_format($user['total'] - $user['t1limit'], 2, '.', ','));
+    } else {
+        $user['t1remaining'] = "Tier 1 not set";
+    }
+
+    if ($user['t2limit'] !== 'Not Defined') {
+        $user['t2reminaing'] = ($user['total'] - $user['t2limit'] <= 0 ? 'Target Reached' : number_format($user['total'] - $user['t2limit'], 2, '.', ','));
+    } else {
+        $user['t2remaining'] = "Tier 2 not set";
+    }
+
+    if ($user['t3limit'] !== 'Not Defined') {
+        $user['t3reminaing'] = ($user['total'] - $user['t3limit'] <= 0 ? 'Target Reached' : number_format($user['total'] - $user['t3limit'], 2, '.', ','));
+    } else {
+        $user['t3remaining'] = "Tier 3 not set";
+    }
+
+    if ($user['t4limit'] !== 'Not Defined') {
+        $user['t4reminaing'] = ($user['total'] - $user['t4limit'] <= 0 ? 'Target Reached' : number_format($user['total'] - $user['t4limit'], 2, '.', ','));
+    } else {
+        $user['t4remaining'] = "Tier 4 not set";
+    }
+
+    if ($user['t5limit'] !== 'Not Defined') {
+        $user['t5reminaing'] = ($user['total'] - $user['t5limit'] <= 0 ? 'Target Reached' : number_format($user['total'] - $user['t5limit'], 2, '.', ','));
+    } else {
+        $user['t5remaining'] = "Tier 5 not set";
+    }
+
+    $region = $user['r_id'];
+
+    $query = "SELECT title FROM promotions2015 WHERE region = $region AND tier = 1";
+    $query = $con->prepare($query);
+    $query->execute();
+    $promos1 = $query->fetchAll(PDO::FETCH_COLUMN);
+
+    $query = $con->prepare("SELECT title FROM promotions2015 WHERE region = $region AND tier = 2");
+    $query->execute();
+    $promos2 = $query->fetchAll(PDO::FETCH_COLUMN);
+
+    $query = $con->prepare("SELECT title FROM promotions2015 WHERE region = $region AND tier = 3");
+    $query->execute();
+    $promos3 = $query->fetchAll(PDO::FETCH_COLUMN);
+
+    $query = $con->prepare("SELECT title FROM promotions2015 WHERE region = $region AND tier = 4");
+    $query->execute();
+    $promos4 = $query->fetchAll(PDO::FETCH_COLUMN);
+
+    $query = $con->prepare("SELECT title FROM promotions2015 WHERE region = $region AND tier = 5");
+    $query->execute();
+    $promos5 = $query->fetchAll(PDO::FETCH_COLUMN);
+
+    if (strpos($message, '[pwreset]') !== false && empty($user['pwreset'])) { //does this message contain a pwreset
+        $resetKey = sha1($user['email'] . time());
+        $userEmail = $user['email'];
+        $sql = "UPDATE users SET pwreset='$resetKey' WHERE `email`='$userEmail';";
+        $query = $con->prepare($sql);
+        try {
+            $query->execute();
+        } catch (PDOException $e) {
+            $_SESSION['notifications']['fail'][] = $user['email'];
+            break;
+        }
+        $user['pwreset'] = $resetKey;
+    }
+
+    $find = array(
+        '[name]',
+        '[email]',
+        '[company]',
+        '[r_name]',
+        '[accNo]',
+        '[SelectedPromo]',
+        '[ExpenseTotal]',
+        '[T1limit]',
+        '[T2limit]',
+        '[T3limit]',
+        '[T1remaining]',
+        '[T2remaining]',
+        '[T3remaining]',
+        '[T4remaining]',
+        '[T5remaining]',
+        '[promotionsTier1]',
+        '[promotionsTier2]',
+        '[promotionsTier3]',
+        '[promotionsTier4]',
+        '[promotionsTier5]',
+        '[Jan]',
+        '[Feb]',
+        '[Mar]',
+        '[Apr]',
+        '[May]',
+        '[Jun]',
+        '[Jul]',
+        '[Aug]',
+        '[Sep]',
+        '[Oct]',
+        '[Nov]',
+        '[Dec]',
+        '[pwreset]'
+    );
+
+    $replace = array(
+        $user['name'],
+        $user['email'],
+        $user['company'],
+        $user['r_name'],
+        $user['accNo'],
+        $user['title'],
+        $user['total'],
+        $user['t1limit'],
+        $user['t2limit'],
+        $user['t3limit'],
+        $user['t1remaining'],
+        $user['t2remaining'],
+        $user['t3remaining'],
+        $user['t4remaining'],
+        $user['t5remaining'],
+        implode(', ', $promos1),
+        implode(', ', $promos2),
+        implode(', ', $promos3),
+        implode(', ', $promos4),
+        implode(', ', $promos5),
+        number_format($user['expenses']['Jan'], 2, '.', ','),
+        number_format($user['expenses']['Feb'], 2, '.', ','),
+        number_format($user['expenses']['Mar'], 2, '.', ','),
+        number_format($user['expenses']['Apr'], 2, '.', ','),
+        number_format($user['expenses']['May'], 2, '.', ','),
+        number_format($user['expenses']['Jun'], 2, '.', ','),
+        number_format($user['expenses']['Jul'], 2, '.', ','),
+        number_format($user['expenses']['Aug'], 2, '.', ','),
+        number_format($user['expenses']['Sep'], 2, '.', ','),
+        number_format($user['expenses']['Oct'], 2, '.', ','),
+        number_format($user['expenses']['Nov'], 2, '.', ','),
+        number_format($user['expenses']['Dec'], 2, '.', ','),
+        'http://www.bencerewards.co.uk/login/reset?user=' . $user['pwreset']
+    );
+
+    $Usubject = str_replace($find, $replace, $subject);
+    $Umessage = str_replace($find, $replace, $message);
+		
+    $mail = new PHPMailer();
+    $mail->charSet = "UTF-8";
+    $mail->IsSMTP();  // telling the class to use SMTP
+    $mail->Host = "mail.bencerewards.co.uk"; // SMTP server
+    $mail->AddAddress($user['email']);
+    if (!empty($user['emailSecondary'])) {
+        $mail->AddAddress($user['emailSecondary']);
+    }
+    $mail->Subject = $Usubject;
+    $mail->Body = $Umessage;
+    $mail->WordWrap = 78;
+
+//debug only
+    // var_dump($Umessage);
+// 	exit;
+
+    if ($mail->Send()) {
+        $_SESSION['notifications']['success'][] = $user['email'];
+    } else {
+        $_SESSION['notifications']['fail'][] = $user['email'];
+    }
+
+    $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
+
+    $_SESSION['notificationMessage'] = nl2br($message);
+
+    if ($count == count($users)) {
+        echo '<META http-equiv="refresh" content="0;URL=/account/notifications/complete">';
+    }
+
+} ?>

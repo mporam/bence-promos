@@ -1,0 +1,110 @@
+<?php
+require __DIR__ . '/inc/notifications.inc';
+require __DIR__ . '/inc/header.inc';
+?>
+
+<script>
+    $(function () {
+        $('select#regions').change(function () {
+            var region = $(this).val();
+            if (region == "All") {
+                $('#users tbody tr').show();
+            } else {
+                $('#users tbody tr').hide();
+                $('#users tbody td[data-region="' + region + '"]').parent('tr').show();
+            }
+        });
+
+        $('select#access').change(function () {
+            var access = $(this).val();
+            if (access == "All") {
+                $('#users tbody tr').show();
+            } else {
+                $('#users tbody tr').hide();
+                $('#users tbody tr[data-access="' + access + '"]').show();
+            }
+        });
+
+        $('#users tbody tr').click(function () {
+            $(this).toggleClass('active');
+            $(this).find('input').prop('checked', $(this).hasClass('active'));
+        });
+
+        $('#users .all-users').change(function () {
+            if ($(this).is(':checked')) {
+                $('#users tbody tr:visible').addClass('active').find('input').prop('checked', true);
+            } else {
+                $('#users tbody tr:visible').removeClass('active').find('input').prop('checked', false);
+            }
+        });
+
+    });
+</script>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+    <form action="/account/notifications/email" method="POST">
+        <div class="col-xs-10">
+            <label>Access Levels:
+                <select id="access">
+                    <option value="All">All</option>
+                    <option value="1">Standard Users</option>
+                    <option value="2">Branch Managers</option>
+                    <option value="3">Regional Managers</option>
+                    <option value="4">Sales Director</option>
+                    <option value="5">Admins</option>
+                </select>
+            </label>
+            <label>Filter By Region:
+                <select id="regions">
+                    <option>All</option>
+                    <?php foreach ($regions as $region) { ?>
+                        <option value="<?php echo $region['r_id']; ?>"><?php echo $region['r_name']; ?></option>
+                    <?php } ?>
+                </select>
+            </label>
+        </div>
+        <div class="col-xs-2">
+            <button type="submit" class="btn btn-default">Select Users</button>
+        </div>
+
+        <div class="col-xs-12">
+            <table class="table" id="users">
+                <thead>
+                <tr>
+                    <th><label><input type="checkbox" class="all-users"/> Select All</label></th>
+                    <th>Account No.</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Region</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($users as $user) {
+                    if (empty($user['access'])) $user['access'] = 1;
+                    ?>
+                    <tr data-access="<?php echo $user['access']; ?>">
+                        <td><input type="checkbox" name="user['<?php echo $user['id']; ?>']"
+                                   value="<?php echo $user['id']; ?>"/></td>
+                        <td><?php echo $user['accNo'] ?></td>
+                        <td><span title="<?php echo $user['company'] ?>"><?php echo $user['name'] ?></span></td>
+                        <td><?php echo $user['email']; ?></td>
+                        <td data-region="<?php echo $user['r_id']; ?>"><?php echo $user['r_name']; ?></td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xs-12">
+            <button type="submit" class="btn btn-default">Select Users</button>
+        </div>
+    </form>
+
+</main>
+<?php
+require __DIR__ . '/inc/footer.inc';
+?>

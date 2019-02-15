@@ -1,0 +1,49 @@
+<?php
+require __DIR__ . '/inc/db_conn.inc';
+require __DIR__ . '/inc/header.inc';
+
+
+?>
+
+    <style>
+        #users tbody tr {
+            cursor: pointer;
+        }
+
+        #users tbody tr.active {
+            background: #cccccc;
+        }
+    </style>
+
+
+    <main class="shadow container">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+            </div>
+        </div>
+
+        <!-- TODO: turn this form into rows and shit-->
+        <form action="import/map" method="post" enctype="multipart/form-data">
+            <div class="col-md-12">
+                <label for="file">Please select a file:</label>
+            </div>
+            <div class="col-md-12">
+                <input type="file" name="data" id="file">
+            </div>
+            <div class="col-md-12">
+                <label>
+                <input type="checkbox" name="headers" value="1" checked>
+                Does the file contain column headings?
+            </label>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-default">Upload</button>
+                </div>
+        </form>
+        </div>
+
+    </main>
+<?php
+require __DIR__ . '/inc/footer.inc';
+?>

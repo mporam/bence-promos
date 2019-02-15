@@ -1,0 +1,121 @@
+<?php
+require __DIR__ . '/inc/db_conn.inc';
+require __DIR__ . '/inc/header.inc';
+?>
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6">
+            <h3>Query Details</h3>
+            <?php
+//if ($_SESSION['access'] !== 5 || empty($_POST['field'])) {
+//    header('Location: /account/');
+//}
+//
+//session_start(); //remove this when finished
+
+$mappings = $_POST['field'];
+
+$ignores = array();
+
+if (array_search("0", $mappings) !== FALSE) { // check if any columns to ignore
+    $ignores = array_keys($mappings, "0"); // get all columns to ignore
+}
+
+foreach($ignores as $key) {
+    unset($mappings[$key]); // remove ignored columns
+}
+$cols = '`' . implode("`, `", $mappings) . '`';
+
+$successCount = 0;
+$failCount = 0;
+$successTotalCount = 0;
+$failTotalCount = 0;
+
+ob_start();
+
+foreach($_SESSION['import'] as $line) {
+    foreach($ignores as $key) {
+        unset($line[$key]); // remove ignored column values
+    }
+    $vals = "'" . implode("', '", $line) . "'";
+
+    $updates = '';
+    foreach ($line as $i => $val) {
+        if ($mappings[$i] !== 'accNo') {
+            $updates .= "`" . $mappings[$i] . "` = '" . $line[$i] . "', ";
+        }
+    }
+
+    $updates = rtrim($updates, ', ');
+
+    // I think perhaps £ are being included in the CSVs, this will strip them out but leave the query intact
+    $vals = preg_replace('/[^0-9A-Za-z`\' ,.]+/', '', $vals);
+
+    $sql = "INSERT INTO `expenses2015` ($cols) VALUES ($vals) ON DUPLICATE KEY UPDATE $updates;";
+
+
+    // for dev mode
+    //echo 'running query: ' . $sql;
+
+    $accNo = reset($line);
+
+    echo 'Running import for account number: ' . $accNo;
+
+    ob_flush();
+
+    $query = $con->prepare($sql);
+    if ($query->execute()) {
+        echo ' - Query successful<br>';
+        $successCount++;
+    } else {
+        echo ' - <span style="color: red;">Query unsuccessful</span><br>';
+        $failCount++;
+    }
+    echo 'Calculating Total. ';
+    ob_flush();
+
+    // select all values
+    $sql = "SELECT `Jan`,`Feb`,`Mar`,`Apr`,`May`,`Jun`,`Jul`,`Aug`,`Sep`,`Oct`,`Nov`,`Dec` FROM `expenses2015` WHERE `accNo` = '$accNo';";
+    $query = $con->prepare($sql);
+    $query->execute();
+    $values = $query->fetch(PDO::FETCH_ASSOC);
+
+    //calculate the total
+    $total = array_sum($values);
+
+    //update total value
+    $sql = "UPDATE expenses2015 SET Total=$total WHERE accNo = '$accNo'";
+    $query = $con->prepare($sql);
+    if (!empty($values) && !empty($total) && $query->execute()) {
+        echo 'Total saved.<br><br>';
+        $successTotalCount++;
+    } else {
+        echo '<span style="color: red;">Total failed.</span><br><br>';
+        $failTotalCount++;
+    }
+    ob_flush();
+}
+    ?>
+            </div>
+            <div class="col-xs-6"> 
+                <h3>Import Summary</h3>
+     <?php
+
+            echo 'Rows imported successfully: ' . $successCount . '<br>';
+echo 'Rows not imported: ' . $failCount . '<br><br>';
+
+echo 'Row total calculated successfully: ' . $successTotalCount . '<br>';
+echo 'Rows totals failed: ' . $failTotalCount;
+ob_end_flush();
+?>
+                </div>
+        </div>
+</main>
+<?php
+require __DIR__ . '/inc/footer.inc';
+?>

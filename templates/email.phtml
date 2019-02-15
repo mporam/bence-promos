@@ -1,0 +1,105 @@
+<?php
+require __DIR__ . '/inc/notifications.inc';
+require __DIR__ . '/inc/header.inc';
+
+//if ($_SESSION['access'] !== 5) {
+//    header('Location: /account/');
+//}
+
+if (empty($_POST['user'])) {
+    header('Location: /account/notifications/');
+}
+$users = join(',', $_POST['user']);
+?>
+
+    <script>
+        $(function () {
+            var $el = $('#message');
+
+            $('#subject, #message').focus(function () {
+                $el = $(this);
+            });
+
+            $('#merge button').click(function (e) {
+                var pos = $el.prop("selectionStart");
+                var val = '[' + $(this).val() + ']';
+                var content = $el.val();
+                var newContent = content.substr(0, pos) + val + content.substr(pos);
+                $el.val(newContent);
+                $el.focus();
+            });
+
+        });
+    </script>
+    <main class="shadow container">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            Don't forget to put a &pound; sign before any targets or limits as these will <strong>not</strong> be added
+            automatically
+            <form class="email" action="/account/notifications/send" method="post">
+                <div>
+                    <label>
+                        Subject:
+                    </label>
+                    <input type="text" required name="subject" id="subject"/>
+                </div>
+                <div>
+                    <label>
+                        Message:
+                    </label>
+                    <textarea name="message" required id="message" rows="10" cols="40"></textarea>
+                </div>
+                <input type="hidden" required value="<?php echo $users; ?>" name="users"/>
+                <button type="submit" class="btn btn-default">Send Notification Email</button>
+            </form>
+        </div>
+
+        <div class="col-md-6" id="merge">
+            <p>Click the below buttons to add the user-specific value to final the message</p>
+
+            <button class="btn btn-info" type="button" value="name">Name</button>
+            <button class="btn btn-info" type="button" value="email">Email</button>
+            <button class="btn btn-info" type="button" value="company">Company</button>
+            <button class="btn btn-info" type="button" value="accNo">Account Number</button>
+            <button class="btn btn-info" type="button" value="SelectedPromo">Selected Promo</button>
+
+            <button class="btn btn-info" type="button" value="Jan">Jan Total</button>
+            <button class="btn btn-info" type="button" value="Feb">Feb Total</button>
+            <button class="btn btn-info" type="button" value="Mar">Mar Total</button>
+            <button class="btn btn-info" type="button" value="Apr">Apr Total</button>
+            <button class="btn btn-info" type="button" value="May">May Total</button>
+            <button class="btn btn-info" type="button" value="Jun">Jun Total</button>
+            <button class="btn btn-info" type="button" value="Jul">Jul Total</button>
+            <button class="btn btn-info" type="button" value="Aug">Aug Total</button>
+            <button class="btn btn-info" type="button" value="Sep">Sep Total</button>
+            <button class="btn btn-info" type="button" value="Oct">Oct Total</button>
+            <button class="btn btn-info" type="button" value="Nov">Nov Total</button>
+            <button class="btn btn-info" type="button" value="Dec">Dec Total</button>
+
+            <button class="btn btn-info" type="button" value="T1limit">Teir 1 Limit</button>
+            <button class="btn btn-info" type="button" value="T2limit">Teir 2 Limit</button>
+            <button class="btn btn-info" type="button" value="T3limit">Teir 3 Limit</button>
+            <button class="btn btn-info" type="button" value="T4limit">Teir 4 Limit</button>
+            <button class="btn btn-info" type="button" value="T5limit">Teir 5 Limit</button>
+            <button class="btn btn-info" type="button" value="T1remaining">Teir 1 Remaining</button>
+            <button class="btn btn-info" type="button" value="T2remaining">Teir 2 Remaining</button>
+            <button class="btn btn-info" type="button" value="T3remaining">Teir 3 Remaining</button>
+            <button class="btn btn-info" type="button" value="T4remaining">Teir 4 Remaining</button>
+            <button class="btn btn-info" type="button" value="T5remaining">Teir 5 Remaining</button>
+            <button class="btn btn-info" type="button" value="promotionsTeir1">Promotions Teir 1</button>
+            <button class="btn btn-info" type="button" value="promotionsTeir2">Promotions Teir 2</button>
+            <button class="btn btn-info" type="button" value="promotionsTeir3">Promotions Teir 3</button>
+            <button class="btn btn-info" type="button" value="promotionsTeir4">Promotions Teir 4</button>
+            <button class="btn btn-info" type="button" value="promotionsTeir5">Promotions Teir 5</button>
+
+            <button class="btn btn-info" type="button" value="pwreset">Password Reset</button>
+        </div>
+
+    </main>
+<?php
+require __DIR__ . '/inc/footer.inc';
+?>

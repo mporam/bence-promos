@@ -1,0 +1,68 @@
+<?php
+require __DIR__ . '/inc/header.inc';
+?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2><?php echo $data['promo']['title']; ?></h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-9 col-xs-12">
+            <p><?php echo $data['promo']['desc']; ?></p>
+
+            <?php 
+			if (isset($data['tiers'][$data['promo']['tier']]) && $data['tiers'][$data['promo']['tier']] == 1) { ?>
+                <a href="/account/book/<?php echo $data['promo']['id']; if ($_SESSION['id'] !== $data['uid']) { echo "/?uid=" . $data['uid']; } ?>" class="btn btn-lg btn-default">Book Now</a>
+            <?php } ?>
+        </div>
+
+        <?php if(!empty($data['promo']['image1'])) { ?>
+            <div class="col-sm-3 col-xs-6">
+                <img src="<?php echo $data['promo']['image1']; ?>" class="promo-img">
+            </div>
+        <?php } ?>
+
+        <?php if(!empty($data['promo']['image2'])) { ?>
+            <div class="col-sm-3 col-xs-6">
+                <img src="<?php echo $data['promo']['image2']; ?>" class="promo-img">
+            </div>
+        <?php } ?>
+
+        <?php if(!empty($data['promo']['image3'])) { ?>
+            <div class="col-sm-3 col-xs-6">
+                <img src="<?php echo $data['promo']['image3']; ?>" class="promo-img">
+            </div>
+        <?php } ?>
+
+        <?php if(!empty($data['promo']['image4'])) { ?>
+            <div class="col-sm-3 col-xs-6">
+                <img src="<?php echo $data['promo']['image4']; ?>" class="promo-img">
+            </div>
+        <?php } ?>
+
+        <?php if(!empty($data['promo']['image5'])) { ?>
+            <div class="col-sm-3 col-xs-6">
+                <img src="<?php echo $data['promo']['image5']; ?>" class="promo-img">
+            </div>
+        <?php } ?>
+
+        <?php if(!empty($data['promo']['image6'])) { ?>
+            <div class="col-sm-3 col-xs-6">
+                <img src="<?php echo $data['promo']['image6']; ?>" class="promo-img">
+            </div>
+        <?php } ?>
+    </div>
+
+
+</main>
+
+<?php require __DIR__ . '/inc/footer.inc'; ?>
