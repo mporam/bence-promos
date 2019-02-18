@@ -146,7 +146,7 @@ $user = $data['user'];
                     if (!empty($data['users'])) {
                         foreach ($data['users'] as $user) {
 							if (!empty($user['name'])) {
-                            	echo "<tr><td><a href='?uid=" . $user['id'] . "'>" . $user['name'] . " - " . $user['company'] . "</a></td></tr>";
+                            	echo "<tr><td><a href='?uid=" . $user['id'] . "'>" . $user['company'] . " - " . $user['name'] . "</a></td></tr>";
 							}
                         }
                     } ?>

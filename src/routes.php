@@ -195,6 +195,7 @@ $app->get('/account[/]', function ($request, $response, $args) {
         foreach ($permissions as $uid) {
             $args['users'][] = $user->getUserWithId($uid);
         }
+        $args['users'] = $user->sortUsers($args['users']);
     } else if ($args['user']['access'] == 1) {
 
         $expenses = new \Bence\Expenses($this->db);
