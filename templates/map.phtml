@@ -63,7 +63,7 @@ $firstLine = $_SESSION['import'][0];
                         <?php
                         echo '<option value="0">Ignore this field</option>';
                         foreach ($cols as $col) {
-                            if ($col['Field'] != 'Total') {
+                            if ($col['Field'] != 'updated') {
                                 echo '<option value="' . $col['Field'] . '">' . $col['Field'] . '</option>';
                             }
                         }

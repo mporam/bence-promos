@@ -47,8 +47,9 @@ class Promotions
 
     static public function getTierName($tier) {
         $tiers = [
-            "1" => "Cristal",
-            "2" => "Dom Perignon"
+            "1" => "The Cherokee",
+            "2" => "The Cheyenne",
+            "3" => "The Chinook"
         ];
 
         return $tiers[$tier];

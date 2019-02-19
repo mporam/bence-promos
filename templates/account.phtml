@@ -28,19 +28,36 @@ $user = $data['user'];
             <?php
             if ($data['user']['access'] == 1) {
             ?>
-            <p>Welcome to the Bence Loyalty Scheme 2018!
+            <p>Welcome to the 2019 Bence Loyalty Scheme.
                 <br>
                 <br>
-                In this promotion you have been set obtainable targets over a nine month period, from March to the end of November. Your Ex Yard Sales, including Obsidian, Bence Roofing, Bence Building Supplies and Bence Decorating sales, will be tracked throughout the whole promotion period and you will be updated every month via email on what you have spent.
-                Furthermore, any figures that are displayed on your account pages on the website and in any email communications will be excluding VAT. Once your target spend has been achieved, you will have a choice of selecting one reward from the choices that are available to you. Only one reward can be chosen and if a target spend has been achieved within the nine month period, the reward can be exercised at that point. All rewards must be claimed with the Bence Rewards team by 31st March 2018.		
+                In this promotion you have been set obtainable targets over a nine month period, from 1st March to the
+                30th November. Your Ex Yard Sales, including Obsidian, Bence Roofing, Bence Building Supplies
+                (Cheltenham & Bourton) and Bence Decorating sales, will be tracked throughout the whole promotion
+                period. You will be updated every month via email on spend.
                 <br>
                 <br>
-                If you have any queries on any aspect of the promotion please do not hesitate to contact the Bence Rewards Team.
+                Any figures that are displayed on your account pages on the website and in any email communications will
+                be excluding VAT and will be a total of what you have spent in the year to date. Once your target spend
+                has been achieved, you will have a choice of selecting one reward from the choices that are available.
+                Only one reward can be chosen and if a target spend has been achieved within the nine month period, the
+                reward can be exercised at that point.
                 <br>
                 <br>
-                Tel: 0117 952 7741<br>
+                This brochure highlights what rewards are available for this year’s loyalty scheme and full reward
+                information is available on the website or on request. All accomplished rewards must be claimed with
+                the Bence Rewards team by 28th February 2020.
+                <br>
+                <br>
+                Best wishes and good luck!
+                <br>
+                The Bence Rewards Team
+                <br>
+                <br>
+                Bence Rewards<br>
                 Email: <a href="mailto:info@bencerewards.co.uk">info@bencerewards.co.uk</a><br>
-                Website: <a href="http://www.bencerewards.co.uk">www.bencerewards.co.uk</a></p>
+                Website: <a href="http://www.bencerewards.co.uk">www.bencerewards.co.uk</a><br>
+                0117 952 7741</p>
             <?php } ?>
         </div>
     </div>
@@ -94,6 +111,13 @@ $user = $data['user'];
             </div>
             <div class="col-xs-8 account-details">
                 <?php echo($user['email'] ?: '--'); ?>
+            </div>
+
+            <div class="col-xs-4 account-details align-right">
+                Account type
+            </div>
+            <div class="col-xs-8 account-details">
+                <?php echo($user['r_name'] ?: '--'); ?>
             </div>
 
             <?php if (!empty($user['startDate']) && !empty($user['endDate'])) { ?>
@@ -198,12 +222,12 @@ $user = $data['user'];
                         <th>Amount</th>
                     </tr>
                     </thead>
-                    <?php foreach ($data['expenses'] as $key => $value) { ?>
+                    <?php //foreach ($data['expenses'] as $key => $value) { ?>
                         <tr>
-                            <th width="15%"><?php echo $key; //$time = strtotime($key); echo date('F', $time); ?></th>
-                            <td><?php echo '&pound;' . number_format($value, 2, '.', ','); ?></td>
+                            <th width="40%">Total (Last updated: <?php echo $data['expenses']['updated'] . ')'; //echo $key; //$time = strtotime($key); echo date('F', $time); ?></th>
+                            <td><?php echo '&pound;' . number_format($data['expenses']['Total'], 2, '.', ','); ?></td>
                         </tr>
-                    <?php } ?>
+                    <?php //} ?>
                 </table>
             </div>
         </div>
