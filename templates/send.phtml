@@ -3,10 +3,29 @@ require __DIR__ . '/inc/notifications.inc';
 require __DIR__ . '/inc/header.inc';
 require __DIR__ . '/../src/classes/PHPMailer.php';
 
-//if ($_SESSION['access'] !== 5) {
-//    header('Location: /account/');
-//    exit;
-//}
+// TODO: increase upload_max_filesize (php.ini)
+
+function handleUpload() {
+    $target_dir = __DIR__ . '/../uploads/';
+    $target_file = $target_dir . basename($_FILES["attachment"]["name"]);
+    $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+    // check size
+    if($_FILES['attachment']['error']) {
+        if ($_FILES['attachment']['error'] === 1) {
+            throw new Exception('File too big. Please upload a file under 2 megabytes in size.');
+        } else {
+            throw new Exception('Something went wrong uploading your file.');
+        }
+    } else if($imageFileType === "js" || $imageFileType === "php") {
+        throw new Exception( "Sorry, this file type is not allowed.");
+    }
+
+    if (move_uploaded_file($_FILES["attachment"]["tmp_name"], $target_file)) {
+        return $target_file;
+    } else {
+        throw new Exception("Sorry, there was an error uploading your file.");
+    }
+}
 
 if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
     header('Location: /account/notifications/');
@@ -214,6 +233,15 @@ foreach ($users as $user) {
     }
     $mail->Subject = $Usubject;
     $mail->Body = $Umessage;
+
+    if ($_FILES["attachment"]["name"]) {
+        try {
+            $uploadPath = handleUpload();
+        } catch (Exception $e) {
+            $_SESSION['notificationError'] = $e->getMessage();
+        }
+        $mail->AddAttachment($uploadPath);
+    }
     $mail->WordWrap = 78;
 
 //debug only
@@ -229,8 +257,11 @@ foreach ($users as $user) {
     $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
 
     $_SESSION['notificationMessage'] = nl2br($message);
+    $_SESSION['notificationMessageAttachment'] = $_FILES["attachment"]["name"];
 
     if ($count == count($users)) {
+        // todo: remove file from uploads now that email has sent or not sent
+        
         echo '<META http-equiv="refresh" content="0;URL=/account/notifications/complete">';
     }
 
