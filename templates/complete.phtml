@@ -20,22 +20,35 @@ if (empty($_SESSION['notifications'])) {
                 </div>
             </div>
             <h4>Message sent:</h4>
+            <p>
             <?php echo $_SESSION['notificationMessage']; ?>
+            </p>
 
-            <h4>Successfully sent to:</h4>
-            <ul>
-                <?php foreach($_SESSION['notifications']['success'] as $user) {
-                    echo "<li>" . $user . "</li>";
-                } ?>
-            </ul>
+            <?php if ($_SESSION['notificationMessageAttachment']) { ?>
+                <h4>Attachment:</h4>
+                <p><?php echo $_SESSION['notificationMessageAttachment']; ?> </p>
+                <?php if ($_SESSION['notificationError']) { ?>
+                    <p><?php echo $_SESSION['notificationError']; ?></p>
+                <?php }; ?>
+            <?php }; ?>
 
+            <?php if (!!count($_SESSION['notifications']['success'])) { ?>
+                <h4>Successfully sent to:</h4>
+                <ul>
+                    <?php foreach ($_SESSION['notifications']['success'] as $user) {
+                        echo "<li>" . $user . "</li>";
+                    } ?>
+                </ul>
+            <?php } ?>
 
-            <h4>Failed to send to:</h4>
-            <ul>
-                <?php foreach($_SESSION['notifications']['fail'] as $user) {
-                    echo "<li>" . $user . "</li>";
-                } ?>
-            </ul>
+            <?php if (!!count($_SESSION['notifications']['fail'])) { ?>
+                <h4>Failed to send to:</h4>
+                <ul>
+                    <?php foreach ($_SESSION['notifications']['fail'] as $user) {
+                        echo "<li>" . $user . "</li>";
+                    } ?>
+                </ul>
+            <?php } ?>
 
             <a href="/account/notifications">Return to notification centre</a>
 
@@ -46,5 +59,7 @@ if (empty($_SESSION['notifications'])) {
 <?php
 require __DIR__ . '/inc/footer.inc';
 
+unset($_SESSION['notificationError']);
+unset($_SESSION['notificationMessageAttachment']);
 unset($_SESSION['notificationMessage']);
 unset($_SESSION['notifications']);
