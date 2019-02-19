@@ -5,19 +5,20 @@ require __DIR__ . '/../src/classes/PHPMailer.php';
 
 // TODO: increase upload_max_filesize (php.ini)
 
-function handleUpload() {
+function handleUpload()
+{
     $target_dir = __DIR__ . '/../uploads/';
     $target_file = $target_dir . basename($_FILES["attachment"]["name"]);
-    $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+    $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
     // check size
-    if($_FILES['attachment']['error']) {
+    if ($_FILES['attachment']['error']) {
         if ($_FILES['attachment']['error'] === 1) {
             throw new Exception('File too big. Please upload a file under 2 megabytes in size.');
         } else {
             throw new Exception('Something went wrong uploading your file.');
         }
-    } else if($imageFileType === "js" || $imageFileType === "php") {
-        throw new Exception( "Sorry, this file type is not allowed.");
+    } else if ($imageFileType === "js" || $imageFileType === "php") {
+        throw new Exception("Sorry, this file type is not allowed.");
     }
 
     if (move_uploaded_file($_FILES["attachment"]["tmp_name"], $target_file)) {
@@ -70,7 +71,7 @@ foreach ($users as $user) {
     $query = $con->prepare("SELECT * FROM expenses2015 WHERE accNo = '$accNo'");
     $query->execute();
     $user['expenses'] = $query->fetch(PDO::FETCH_ASSOC);
-		
+
     $user['total'] = intval(array_sum($user['expenses']));
 
     $user['total'] = (is_int($user['total']) && $user['total'] > 0 ? number_format($user['total'], 2, '.', ',') : '&pound0.00');
@@ -222,7 +223,7 @@ foreach ($users as $user) {
 
     $Usubject = str_replace($find, $replace, $subject);
     $Umessage = str_replace($find, $replace, $message);
-		
+
     $mail = new PHPMailer();
     $mail->charSet = "UTF-8";
     $mail->IsSMTP();  // telling the class to use SMTP
@@ -245,7 +246,7 @@ foreach ($users as $user) {
     $mail->WordWrap = 78;
 
 //debug only
-    // var_dump($Umessage);
+//     var_dump($Umessage);
 // 	exit;
 
     if ($mail->Send()) {
@@ -261,7 +262,7 @@ foreach ($users as $user) {
 
     if ($count == count($users)) {
         // todo: remove file from uploads now that email has sent or not sent
-        
+
         echo '<META http-equiv="refresh" content="0;URL=/account/notifications/complete">';
     }
 

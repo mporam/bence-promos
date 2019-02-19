@@ -13,48 +13,48 @@ if (empty($_SESSION['notifications'])) {
 }
 ?>
 
-        <main class="shadow container">
-            <div class="row">
-                <div class="col-xs-12">
-                    <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
-                </div>
+    <main class="shadow container">
+        <div class="row">
+            <div class="col-xs-12">
+                <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
             </div>
-            <h4>Message sent:</h4>
-            <p>
+        </div>
+        <h4>Message sent:</h4>
+        <p>
             <?php echo $_SESSION['notificationMessage']; ?>
-            </p>
+        </p>
 
-            <?php if ($_SESSION['notificationMessageAttachment']) { ?>
-                <h4>Attachment:</h4>
-                <p><?php echo $_SESSION['notificationMessageAttachment']; ?> </p>
-                <?php if ($_SESSION['notificationAttachmentError']) { ?>
-                    <p><?php echo $_SESSION['notificationAttachmentError']; ?></p>
-                <?php }; ?>
+        <?php if ($_SESSION['notificationMessageAttachment']) { ?>
+            <h4>Attachment:</h4>
+            <p><?php echo $_SESSION['notificationMessageAttachment']; ?> </p>
+            <?php if ($_SESSION['notificationAttachmentError']) { ?>
+                <p><?php echo $_SESSION['notificationAttachmentError']; ?></p>
             <?php }; ?>
+        <?php }; ?>
 
-            <?php if (!!count($_SESSION['notifications']['success'])) { ?>
-                <h4>Successfully sent to:</h4>
-                <ul>
-                    <?php foreach ($_SESSION['notifications']['success'] as $user) {
-                        echo "<li>" . $user . "</li>";
-                    } ?>
-                </ul>
-            <?php } ?>
+        <?php if (!!count($_SESSION['notifications']['success'])) { ?>
+            <h4>Successfully sent to:</h4>
+            <ul>
+                <?php foreach ($_SESSION['notifications']['success'] as $user) {
+                    echo "<li>" . $user . "</li>";
+                } ?>
+            </ul>
+        <?php } ?>
 
-            <?php if (!!count($_SESSION['notifications']['fail'])) { ?>
-                <h4>Failed to send to:</h4>
-                <ul>
-                    <?php foreach ($_SESSION['notifications']['fail'] as $user) {
-                        echo "<li>" . $user . "</li>";
-                    } ?>
-                </ul>
-            <?php } ?>
+        <?php if (!!count($_SESSION['notifications']['fail'])) { ?>
+            <h4>Failed to send to:</h4>
+            <ul>
+                <?php foreach ($_SESSION['notifications']['fail'] as $user) {
+                    echo "<li>" . $user . "</li>";
+                } ?>
+            </ul>
+        <?php } ?>
 
-            <a href="/account/notifications">Return to notification centre</a>
+        <a href="/account/notifications">Return to notification centre</a>
 
-            <p>&nbsp;</p>
+        <p>&nbsp;</p>
 
-        </main>
+    </main>
 
 <?php
 require __DIR__ . '/inc/footer.inc';

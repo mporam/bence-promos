@@ -28,14 +28,14 @@ $container['db'] = function ($container) {
     $password = $cfg['password'];
 
     try {
-        $conn = new PDO("mysql:host=$servername;dbname=$database", "$username","$password");
+        $conn = new PDO("mysql:host=$servername;dbname=$database", "$username", "$password");
         echo $database;
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
         $logger = $container->get('logger');
         $logger->error("Connection failed: " . $e->getMessage());
         die("Database Connection failed");
-        
+
     }
 
     return $conn;
