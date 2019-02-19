@@ -27,8 +27,8 @@ if (empty($_SESSION['notifications'])) {
             <?php if ($_SESSION['notificationMessageAttachment']) { ?>
                 <h4>Attachment:</h4>
                 <p><?php echo $_SESSION['notificationMessageAttachment']; ?> </p>
-                <?php if ($_SESSION['notificationError']) { ?>
-                    <p><?php echo $_SESSION['notificationError']; ?></p>
+                <?php if ($_SESSION['notificationAttachmentError']) { ?>
+                    <p><?php echo $_SESSION['notificationAttachmentError']; ?></p>
                 <?php }; ?>
             <?php }; ?>
 
@@ -59,7 +59,7 @@ if (empty($_SESSION['notifications'])) {
 <?php
 require __DIR__ . '/inc/footer.inc';
 
-unset($_SESSION['notificationError']);
+unset($_SESSION['notificationAttachmentError']);
 unset($_SESSION['notificationMessageAttachment']);
 unset($_SESSION['notificationMessage']);
 unset($_SESSION['notifications']);

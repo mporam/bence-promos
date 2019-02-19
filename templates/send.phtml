@@ -238,7 +238,7 @@ foreach ($users as $user) {
         try {
             $uploadPath = handleUpload();
         } catch (Exception $e) {
-            $_SESSION['notificationError'] = $e->getMessage();
+            $_SESSION['notificationAttachmentError'] = $e->getMessage();
         }
         $mail->AddAttachment($uploadPath);
     }
