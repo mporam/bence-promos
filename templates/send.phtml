@@ -31,6 +31,15 @@ function handleAttachment(PHPMailer $mail)
     }
 }
 
+function sendMail(PHPMailer $mail, $email)
+{
+    if ($mail->Send()) {
+        $_SESSION['notifications']['success'][] = $email;
+    } else {
+        $_SESSION['notifications']['fail'][] = $email;
+    }
+}
+
 if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
     header('Location: /account/notifications/');
     exit;
@@ -238,23 +247,22 @@ foreach ($users as $user) {
     $mail->Subject = $Usubject;
     $mail->Body = $Umessage;
 
-    if ($_FILES["attachment"]["name"]) {
-        try {
-            $mail = handleAttachment($mail);
-        } catch (Exception $e) {
-            $_SESSION['notificationAttachmentError'] = $e->getMessage();
-        }
-    }
     $mail->WordWrap = 78;
 
 //debug only
 //     var_dump($Umessage);
 // 	exit;
 
-    if ($mail->Send()) {
-        $_SESSION['notifications']['success'][] = $user['email'];
+    if ($_FILES["attachment"]["name"]) {
+        try {
+            $mail = handleAttachment($mail);
+            // doesn't try to send if attachment throws exception
+            sendMail($mail, $user['email']);
+        } catch (Exception $e) {
+            $_SESSION['notificationAttachmentError'] = $e->getMessage();
+        }
     } else {
-        $_SESSION['notifications']['fail'][] = $user['email'];
+        sendMail($mail, $user['email']);
     }
 
     $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
