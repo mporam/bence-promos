@@ -182,6 +182,7 @@ $app->get('/account[/]', function ($request, $response, $args) {
 
         $userTiers = $limits->getTiersForUser($args['user']['id']);
 
+        $args['yourstats'] = [];
         foreach ($userTiers as $tier) {
             $args['yourstats'][] .= $stat->getUserStatCircle('userstat' . $tier, $args['user']['accNo'], $tier);
         }
@@ -195,6 +196,7 @@ $app->get('/account[/]', function ($request, $response, $args) {
         foreach ($permissions as $uid) {
             $args['users'][] = $user->getUserWithId($uid);
         }
+        $args['users'] = $user->sortUsers($args['users']);
     } else if ($args['user']['access'] == 1) {
 
         $expenses = new \Bence\Expenses($this->db);

@@ -179,4 +179,17 @@ class User
 
         return $return;
     }
+
+    public function sortUsers($users) {
+
+        usort($users, array('\Bence\User','compareByCompanyName'));
+
+        return $users;
+    }
+
+    private static function compareByCompanyName($a, $b) {
+        return strcmp($a["company"], $b["company"]);
+    }
+
+
 }
