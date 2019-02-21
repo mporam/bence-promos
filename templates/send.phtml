@@ -261,7 +261,6 @@ foreach ($users as $user) {
     $_SESSION['notificationMessageAttachment'] = $_FILES["attachment"]["name"];
 
     if ($count == count($users)) {
-        // todo: remove file from uploads now that email has sent or not sent
 
         echo '<META http-equiv="refresh" content="0;URL=/account/notifications/complete">';
     }
