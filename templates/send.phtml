@@ -5,12 +5,14 @@ require __DIR__ . '/../src/classes/PHPMailer.php';
 
 // TODO: increase upload_max_filesize (php.ini)
 
-function handleUpload()
+function handleAttachment(PHPMailer $mail)
 {
-    $target_dir = __DIR__ . '/../uploads/';
-    $target_file = $target_dir . basename($_FILES["attachment"]["name"]);
-    $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
-    // check size
+    $targetDir = __DIR__ . '/../uploads/';
+    $fileName = basename($_FILES["attachment"]["name"]);
+    // file stored as basedir/ssmmhhDDMMYY-filename to cope with dupes
+    $targetFile = $targetDir . date('siHdmy') . '-' . $fileName;
+    $imageFileType = pathinfo($targetFile, PATHINFO_EXTENSION);
+
     if ($_FILES['attachment']['error']) {
         if ($_FILES['attachment']['error'] === 1) {
             throw new Exception('File too big. Please upload a file under 2 megabytes in size.');
@@ -21,8 +23,9 @@ function handleUpload()
         throw new Exception("Sorry, this file type is not allowed.");
     }
 
-    if (move_uploaded_file($_FILES["attachment"]["tmp_name"], $target_file)) {
-        return $target_file;
+    if (move_uploaded_file($_FILES["attachment"]["tmp_name"], $targetFile)) {
+        $mail->AddAttachment($targetFile, $fileName);
+        return $mail;
     } else {
         throw new Exception("Sorry, there was an error uploading your file.");
     }
@@ -237,11 +240,10 @@ foreach ($users as $user) {
 
     if ($_FILES["attachment"]["name"]) {
         try {
-            $uploadPath = handleUpload();
+            $mail = handleAttachment($mail);
         } catch (Exception $e) {
             $_SESSION['notificationAttachmentError'] = $e->getMessage();
         }
-        $mail->AddAttachment($uploadPath);
     }
     $mail->WordWrap = 78;
 
