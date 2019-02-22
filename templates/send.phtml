@@ -40,6 +40,27 @@ function sendMail(PHPMailer $mail, $email)
     }
 }
 
+function addEmailToDB(PDO $dbCon, $subject, $message, $attachmentName = '')
+{
+    try {
+        if (!!$attachmentName) {
+            $sql = 'INSERT INTO `email_log` (`subject`, `message`, `attachment_name`)
+            VALUES (?, ?, ?)'; // get back id
+            $query = $dbCon->prepare($sql);
+            $query->execute(array($subject, $message, $attachmentName));
+        } else {
+            $sql = 'INSERT INTO `email_log` (`subject`, `message`)
+            VALUES (?, ?)';
+            $query = $dbCon->prepare($sql);
+            $query->execute(array($subject, $message));
+        }
+        $id = $dbCon->lastInsertId();
+        return $id;
+    } catch (Exception $e) {
+        var_dump($e);
+    }
+}
+
 if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
     header('Location: /account/notifications/');
     exit;
