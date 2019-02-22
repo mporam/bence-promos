@@ -5,12 +5,15 @@ require __DIR__ . '/../src/classes/PHPMailer.php';
 
 // TODO: increase upload_max_filesize (php.ini)
 
-function handleAttachment(PHPMailer $mail)
+function dateFileName($fileName) {
+    return date('siHdmy') . '-' . $fileName;
+}
+
+function handleAttachment(PHPMailer $mail, $fileName, $datedFileName)
 {
     $targetDir = __DIR__ . '/../uploads/';
-    $fileName = basename($_FILES["attachment"]["name"]);
     // file stored as basedir/ssmmhhDDMMYY-filename to cope with dupes
-    $targetFile = $targetDir . date('siHdmy') . '-' . $fileName;
+    $targetFile = $targetDir . $datedFileName;
     $imageFileType = pathinfo($targetFile, PATHINFO_EXTENSION);
 
     if ($_FILES['attachment']['error']) {
@@ -286,9 +289,9 @@ foreach ($users as $user) {
 //     var_dump($Umessage);
 // 	exit;
 
-    if ($_FILES["attachment"]["name"]) {
+    if ($attachmentName) {
         try {
-            $mail = handleAttachment($mail);
+            $mail = handleAttachment($mail, $attachmentName, $datedFileName);
             // doesn't try to send if attachment throws exception
             sendMail($mail, $user['email']);
         } catch (Exception $e) {
@@ -301,7 +304,7 @@ foreach ($users as $user) {
     $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
 
     $_SESSION['notificationMessage'] = nl2br($message);
-    $_SESSION['notificationMessageAttachment'] = $_FILES["attachment"]["name"];
+    $_SESSION['notificationMessageAttachment'] = $attachmentName;
 
     if ($count == count($users)) {
 
