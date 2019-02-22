@@ -481,6 +481,18 @@ $app->get('/account/notifications/complete[/]', function ($request, $response, $
     return $this->renderer->render($response, 'complete.phtml', $args);
 });
 
+$app->get('/account/notifications/history[/]', function ($request, $response, $args) {
+    $args['breadcrumbs'] = [
+        '/' => 'Home',
+        '/account' => 'Account',
+        '/account/notifications' => 'Notifications'
+    ];
+    $args['db'] = $this->db;
+    $args['loggedIn'] = $_SESSION['loggedIn'];
+
+    return $this->renderer->render($response, 'notification_history.phtml', $args);
+});
+
 $app->get('/account/import[/]', function ($request, $response, $args) {
     $args['breadcrumbs'] = [
         '/' => 'Home',
