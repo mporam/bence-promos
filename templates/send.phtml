@@ -61,6 +61,18 @@ function addEmailToDB(PDO $dbCon, $subject, $message, $attachmentName = '')
     }
 }
 
+function setUserEmailStatus(PDO $dbCon, $emailId, $userId, $sentOkay = 0)
+{
+    // convert from bool to number
+    $sentOkay = $sentOkay ? 1 : 0;
+    $sql = 'INSERT INTO email_user_sent_status (email_id, user_id, sent_successfully)
+            VALUES (?, ?, ?)';
+    $query = $dbCon->prepare($sql);
+    $query->execute(array($emailId, $userId, $sentOkay));
+    $id = $dbCon->lastInsertId();
+    return $id;
+}
+
 if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
     header('Location: /account/notifications/');
     exit;
