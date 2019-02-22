@@ -47,7 +47,6 @@ function sendMail(PHPMailer $mail, $email)
 
 function addEmailToDB(PDO $dbCon, $subject, $message, $attachmentName = '')
 {
-    try {
         if (!!$attachmentName) {
             $sql = 'INSERT INTO `email_log` (`subject`, `message`, `attachment_name`)
             VALUES (?, ?, ?)'; // get back id
@@ -61,9 +60,6 @@ function addEmailToDB(PDO $dbCon, $subject, $message, $attachmentName = '')
         }
         $id = $dbCon->lastInsertId();
         return $id;
-    } catch (Exception $e) {
-        var_dump($e);
-    }
 }
 
 function setUserEmailStatus(PDO $dbCon, $emailId, $userId, $sentOkay = 0)
