@@ -47,10 +47,10 @@ $total = 0;
                     ?>
                     <tr>
                         <td>
-                            <a href="/notifications/<?php echo $notification['id']; ?>"><?php echo $notification['id']; ?></a>
+                            <?php echo $notification['id']; ?></a>
                         </td>
                         <td>
-                            <?php echo $notification['subject']; ?>
+                            <a href="/account/notifications/<?php echo $notification['id']; ?>"><?php echo $notification['subject']; ?></a>
                         </td>
                         <td>
                             <?php echo $notification['created']; ?>

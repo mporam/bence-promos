@@ -1,0 +1,53 @@
+<?php
+require __DIR__ . '/inc/header.inc';
+
+$notification = $data['notification'][0];
+$recipients = $data['recipients'];
+?>
+
+<main class="shadow container">
+    <div class="row">
+        <div class="col-xs-12">
+            <?php require __DIR__ . '/inc/breadcrumbs.inc'; ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2><?php echo $notification['subject'] ?></h2>
+
+                <p><?php echo $notification['message'] ?>
+                <br>
+                <br>
+            <p>Attachment: <?php echo ($notification['attachment_name'] ? $notification['attachment_name']: 'None.') ?></p>
+            <i>(Tip: This is the name used in your stored files. The name sent to recipients did not contain a date.)</i>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Successfully sent to:</h2>
+            <ul>
+                <?php foreach ($recipients as $user) {
+                    if ($user['sent_successfully']) {?>
+                <li><a href="/account?uid=<?php echo $user['user_id'] ?>"><?php echo $user['email'] ?></a></li>
+                <?php }} ?>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Failed to send to:</h2>
+            <ul>
+                <?php foreach ($recipients as $user) {
+                    if (!$user['sent_successfully']) {?>
+                <li><a href="/account?uid=<?php echo $user['user_id'] ?>"><?php echo $user['email'] ?></a></li>
+                <?php }} ?>
+            </ul>
+        </div>
+    </div>
+
+    <!-- todo: sent to... -->
+</main>
+
+<?php require __DIR__ . '/inc/footer.inc'; ?>
