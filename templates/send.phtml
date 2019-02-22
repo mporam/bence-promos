@@ -5,7 +5,8 @@ require __DIR__ . '/../src/classes/PHPMailer.php';
 
 // TODO: increase upload_max_filesize (php.ini)
 
-function dateFileName($fileName) {
+function dateFileName($fileName)
+{
     return date('siHdmy') . '-' . $fileName;
 }
 
@@ -47,19 +48,19 @@ function sendMail(PHPMailer $mail, $email)
 
 function addEmailToDB(PDO $dbCon, $subject, $message, $attachmentName = '')
 {
-        if (!!$attachmentName) {
-            $sql = 'INSERT INTO `email_log` (`subject`, `message`, `attachment_name`)
+    if (!!$attachmentName) {
+        $sql = 'INSERT INTO `email_log` (`subject`, `message`, `attachment_name`)
             VALUES (?, ?, ?)'; // get back id
-            $query = $dbCon->prepare($sql);
-            $query->execute(array($subject, $message, $attachmentName));
-        } else {
-            $sql = 'INSERT INTO `email_log` (`subject`, `message`)
+        $query = $dbCon->prepare($sql);
+        $query->execute(array($subject, $message, $attachmentName));
+    } else {
+        $sql = 'INSERT INTO `email_log` (`subject`, `message`)
             VALUES (?, ?)';
-            $query = $dbCon->prepare($sql);
-            $query->execute(array($subject, $message));
-        }
-        $id = $dbCon->lastInsertId();
-        return $id;
+        $query = $dbCon->prepare($sql);
+        $query->execute(array($subject, $message));
+    }
+    $id = $dbCon->lastInsertId();
+    return $id;
 }
 
 function setUserEmailStatus(PDO $dbCon, $emailId, $userId, $sentOkay = 0)
