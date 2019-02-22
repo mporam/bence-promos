@@ -38,8 +38,10 @@ function sendMail(PHPMailer $mail, $email)
 {
     if ($mail->Send()) {
         $_SESSION['notifications']['success'][] = $email;
+        return true;
     } else {
         $_SESSION['notifications']['fail'][] = $email;
+        return false;
     }
 }
 
@@ -86,8 +88,11 @@ if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'
 $subject = $_POST['subject'];
 $message = $_POST['message'];
 $users = $_POST['users'];
+$attachmentName = $_FILES["attachment"]["name"];
+$datedFileName = dateFileName($attachmentName);
+$emailId = addEmailToDB($con, $subject, $message, $datedFileName);
 
-$sql = "SELECT *, users.accNo AS accNo
+$sql = "SELECT *, users.id AS userId, users.accNo AS accNo
   FROM users
   LEFT JOIN regions ON users.region = regions.r_id
   LEFT JOIN promotions2015 ON users.promo = promotions2015.id
@@ -293,14 +298,14 @@ foreach ($users as $user) {
         try {
             $mail = handleAttachment($mail, $attachmentName, $datedFileName);
             // doesn't try to send if attachment throws exception
-            sendMail($mail, $user['email']);
+            $sendSucceeded = sendMail($mail, $user['email']);
         } catch (Exception $e) {
             $_SESSION['notificationAttachmentError'] = $e->getMessage();
         }
     } else {
-        sendMail($mail, $user['email']);
+        $sendSucceeded = sendMail($mail, $user['email']);
     }
-
+    setUserEmailStatus($con, $emailId, $user['userId'], $sendSucceeded);
     $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
 
     $_SESSION['notificationMessage'] = nl2br($message);
