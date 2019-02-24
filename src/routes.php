@@ -446,6 +446,18 @@ $app->get('/account/notifications[/]', function ($request, $response, $args) {
     $args['db'] = $this->db;
     $args['loggedIn'] = $_SESSION['loggedIn'];
 
+    $get = $request->getQueryParams();
+
+    if (!empty($get['nid']) && $_SESSION['access'] == 5) {
+        $notificationId = $get['nid'];
+        $promotions = new \Bence\Notifications($this->db);
+
+        $args['notification'] = $promotions->getNotificationById($notificationId);
+        $args['recipients'] = $promotions->getRecipientsByNotificationId($notificationId);
+
+        return $this->renderer->render($response, '/notification.phtml', $args);
+    }
+
     return $this->renderer->render($response, 'notifications.phtml', $args);
 });
 
@@ -505,35 +517,9 @@ $app->get('/account/notifications/history[/]', function ($request, $response, $a
     ];
     $args['db'] = $this->db;
     $args['loggedIn'] = $_SESSION['loggedIn'];
-    // todo: set admin access only
-
     return $this->renderer->render($response, 'notification_history.phtml', $args);
 });
 
-$app->get('/account/notifications/{nid}[/]', function ($request, $response, $args) {
-    $notificationId = $args['nid'];
-    $promotions = new \Bence\Notifications($this->db);
-
-    $args['loggedIn'] = false; // what is this and how do I undo it? todo: ADMIN ONLY
-    if (!empty($_SESSION)) {
-        $args['loggedIn'] = $_SESSION['loggedIn'];
-        $args['user'] = $_SESSION;
-    }
-
-    $args['breadcrumbs'] = ['/' => 'Home'];
-    if ($args['loggedIn']) {
-        $args['breadcrumbs'] = [
-            '/' => 'Home',
-            '/account' => 'Account',
-            '/account/notifications' => 'Notifications'
-        ];
-    }
-
-    $args['notification'] = $promotions->getNotificationById($notificationId);
-    $args['recipients'] = $promotions->getRecipientsByNotificationId($notificationId);
-
-    return $this->renderer->render($response, '/notification.phtml', $args);
-});
 
 $app->get('/account/import[/]', function ($request, $response, $args) {
     $args['breadcrumbs'] = [
