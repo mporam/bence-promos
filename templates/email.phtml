@@ -54,7 +54,6 @@ $users = join(',', $_POST['user']);
                     <textarea name="message" required id="message" rows="10" cols="40"></textarea>
                 </div>
                 <input type="hidden" required value="<?php echo $users; ?>" name="users"/>
-                <!-- <input type="hidden" name="MAX_FILE_SIZE" value="2000000" /> saves time but removes helpful error message -->
                 <input type="file" name="attachment"/>
                 <button type="submit" class="btn btn-default">Send Notification Email</button>
             </form>
