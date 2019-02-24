@@ -3,13 +3,20 @@ require __DIR__ . '/inc/notifications.inc';
 require __DIR__ . '/inc/header.inc';
 require __DIR__ . '/../src/classes/PHPMailer.php';
 
-function handleAttachment(PHPMailer $mail)
+// TODO: increase upload_max_filesize (php.ini)
+
+function dateFileName($fileName)
+{
+    $pathParts = pathinfo($fileName);
+    return $pathParts['filename'] . date('siHdmy') . '.' . $pathParts['extension'];
+}
+
+function handleAttachment(PHPMailer $mail, $fileName, $datedFileName)
 {
     $targetDir = __DIR__ . '/../uploads/';
-    $fileName = basename($_FILES["attachment"]["name"]);
     // file stored as basedir/ssmmhhDDMMYY-filename to cope with dupes
-    $targetFile = $targetDir . date('siHdmy') . '-' . $fileName;
-    $imageFileType = pathinfo($targetFile, PATHINFO_EXTENSION);
+    $targetFile = $targetDir . $datedFileName;
+    $fileExtension = pathinfo($targetFile, PATHINFO_EXTENSION);
 
     if ($_FILES['attachment']['error']) {
         if ($_FILES['attachment']['error'] === 1) {
@@ -17,7 +24,7 @@ function handleAttachment(PHPMailer $mail)
         } else {
             throw new Exception('Something went wrong uploading your file.');
         }
-    } else if ($imageFileType === "js" || $imageFileType === "php") {
+    } else if ($fileExtension === "js" || $fileExtension === "php") {
         throw new Exception("Sorry, this file type is not allowed.");
     }
 
@@ -33,9 +40,40 @@ function sendMail(PHPMailer $mail, $email)
 {
     if ($mail->Send()) {
         $_SESSION['notifications']['success'][] = $email;
+        return true;
     } else {
         $_SESSION['notifications']['fail'][] = $email;
+        return false;
     }
+}
+
+function addEmailToDB(PDO $dbCon, $subject, $message, $attachmentName = '')
+{
+    if (!!$attachmentName) {
+        $sql = 'INSERT INTO `email_log` (`subject`, `message`, `attachment_name`)
+            VALUES (?, ?, ?)'; // get back id
+        $query = $dbCon->prepare($sql);
+        $query->execute(array($subject, $message, $attachmentName));
+    } else {
+        $sql = 'INSERT INTO `email_log` (`subject`, `message`)
+            VALUES (?, ?)';
+        $query = $dbCon->prepare($sql);
+        $query->execute(array($subject, $message));
+    }
+    $id = $dbCon->lastInsertId();
+    return $id;
+}
+
+function setUserEmailStatus(PDO $dbCon, $emailId, $userId, $sentOkay = 0)
+{
+    // convert from bool to number
+    $sentOkay = $sentOkay ? 1 : 0;
+    $sql = 'INSERT INTO email_user_sent_status (email_id, user_id, sent_successfully)
+            VALUES (?, ?, ?)';
+    $query = $dbCon->prepare($sql);
+    $query->execute(array($emailId, $userId, $sentOkay));
+    $id = $dbCon->lastInsertId();
+    return $id;
 }
 
 if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
@@ -48,8 +86,11 @@ if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'
 $subject = $_POST['subject'];
 $message = $_POST['message'];
 $users = $_POST['users'];
+$attachmentName = $_FILES["attachment"]["name"];
+$datedFileName = dateFileName($attachmentName);
+$emailId = addEmailToDB($con, $subject, $message, $datedFileName);
 
-$sql = "SELECT *, users.accNo AS accNo
+$sql = "SELECT *, users.id AS userId, users.accNo AS accNo
   FROM users
   LEFT JOIN regions ON users.region = regions.r_id
   LEFT JOIN promotions2015 ON users.promo = promotions2015.id
@@ -251,22 +292,22 @@ foreach ($users as $user) {
 //     var_dump($Umessage);
 // 	exit;
 
-    if ($_FILES["attachment"]["name"]) {
+    if ($attachmentName) {
         try {
-            $mail = handleAttachment($mail);
+            $mail = handleAttachment($mail, $attachmentName, $datedFileName);
             // doesn't try to send if attachment throws exception
-            sendMail($mail, $user['email']);
+            $sendSucceeded = sendMail($mail, $user['email']);
         } catch (Exception $e) {
             $_SESSION['notificationAttachmentError'] = $e->getMessage();
         }
     } else {
-        sendMail($mail, $user['email']);
+        $sendSucceeded = sendMail($mail, $user['email']);
     }
-
+    setUserEmailStatus($con, $emailId, $user['userId'], $sendSucceeded);
     $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
 
     $_SESSION['notificationMessage'] = nl2br($message);
-    $_SESSION['notificationMessageAttachment'] = $_FILES["attachment"]["name"];
+    $_SESSION['notificationMessageAttachment'] = $attachmentName;
 
     if ($count == count($users)) {
 

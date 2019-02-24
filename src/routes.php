@@ -435,14 +435,37 @@ $app->post('/account/update[/]', function ($request, $response, $args) {
 });
 
 $app->get('/account/notifications[/]', function ($request, $response, $args) {
-    $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account', '/account/notifications' => 'Notifications'];
+    if (!$_SESSION['loggedIn'] || empty($_SESSION['loggedIn'])) {
+        return $response->withStatus(200)->withHeader('Location', '/');
+    }
+    $args['breadcrumbs'] = [
+        '/' => 'Home',
+        '/account' => 'Account',
+        '/account/notifications' => 'Notifications'
+    ];
     $args['db'] = $this->db;
     $args['loggedIn'] = $_SESSION['loggedIn'];
+
+    $get = $request->getQueryParams();
+
+    if (!empty($get['nid']) && $_SESSION['access'] == 5) {
+        $notificationId = $get['nid'];
+        $promotions = new \Bence\Notifications($this->db);
+
+        $args['notification'] = $promotions->getNotificationById($notificationId);
+        $args['recipients'] = $promotions->getRecipientsByNotificationId($notificationId);
+        $args['breadcrumbs']['/account/notifications/history'] = 'Notification Log';
+
+        return $this->renderer->render($response, '/notification.phtml', $args);
+    }
 
     return $this->renderer->render($response, 'notifications.phtml', $args);
 });
 
 $app->post('/account/notifications/email[/]', function ($request, $response, $args) {
+    if (!$_SESSION['loggedIn'] || empty($_SESSION['loggedIn'])) {
+        return $response->withStatus(200)->withHeader('Location', '/');
+    }
     $args['breadcrumbs'] = [
         '/' => 'Home',
         '/account' => 'Account',
@@ -480,6 +503,28 @@ $app->get('/account/notifications/complete[/]', function ($request, $response, $
 
     return $this->renderer->render($response, 'complete.phtml', $args);
 });
+
+$app->get('/account/notifications/history[/]', function ($request, $response, $args) {
+    if (!$_SESSION['loggedIn']
+        || empty($_SESSION['loggedIn'])
+        || $_SESSION['access'] != 5) {
+        return $response->withStatus(200)->withHeader('Location', '/');
+    }
+    $args['breadcrumbs'] = [
+        '/' => 'Home',
+        '/account' => 'Account',
+        '/account/notifications' => 'Notifications',
+        '/account/notifications/history' => 'Notification Log'
+    ];
+    $args['db'] = $this->db;
+    $args['loggedIn'] = $_SESSION['loggedIn'];
+
+    $notifications = new \Bence\Notifications($this->db);
+    $args['notifications'] = $notifications->getNotificationLog();
+
+    return $this->renderer->render($response, 'notification_history.phtml', $args);
+});
+
 
 $app->get('/account/import[/]', function ($request, $response, $args) {
     $args['breadcrumbs'] = [
