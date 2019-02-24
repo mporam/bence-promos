@@ -3,8 +3,6 @@ require __DIR__ . '/inc/notifications.inc';
 require __DIR__ . '/inc/header.inc';
 require __DIR__ . '/../src/classes/PHPMailer.php';
 
-// TODO: increase upload_max_filesize (php.ini)
-
 function handleAttachment(PHPMailer $mail)
 {
     $targetDir = __DIR__ . '/../uploads/';
@@ -15,7 +13,7 @@ function handleAttachment(PHPMailer $mail)
 
     if ($_FILES['attachment']['error']) {
         if ($_FILES['attachment']['error'] === 1) {
-            throw new Exception('File too big. Please upload a file under 2 megabytes in size.');
+            throw new Exception('File too big. Please upload a smaller file.');
         } else {
             throw new Exception('Something went wrong uploading your file.');
         }
