@@ -7,7 +7,8 @@ require __DIR__ . '/../src/classes/PHPMailer.php';
 
 function dateFileName($fileName)
 {
-    return date('siHdmy') . '-' . $fileName;
+    $pathParts = pathinfo($fileName);
+    return $pathParts['filename'] . date('siHdmy') . '.' . $pathParts['extension'];
 }
 
 function handleAttachment(PHPMailer $mail, $fileName, $datedFileName)
@@ -15,7 +16,7 @@ function handleAttachment(PHPMailer $mail, $fileName, $datedFileName)
     $targetDir = __DIR__ . '/../uploads/';
     // file stored as basedir/ssmmhhDDMMYY-filename to cope with dupes
     $targetFile = $targetDir . $datedFileName;
-    $imageFileType = pathinfo($targetFile, PATHINFO_EXTENSION);
+    $fileExtension = pathinfo($targetFile, PATHINFO_EXTENSION);
 
     if ($_FILES['attachment']['error']) {
         if ($_FILES['attachment']['error'] === 1) {
@@ -23,7 +24,7 @@ function handleAttachment(PHPMailer $mail, $fileName, $datedFileName)
         } else {
             throw new Exception('Something went wrong uploading your file.');
         }
-    } else if ($imageFileType === "js" || $imageFileType === "php") {
+    } else if ($fileExtension === "js" || $fileExtension === "php") {
         throw new Exception("Sorry, this file type is not allowed.");
     }
 
