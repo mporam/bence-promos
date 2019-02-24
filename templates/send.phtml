@@ -3,10 +3,40 @@ require __DIR__ . '/inc/notifications.inc';
 require __DIR__ . '/inc/header.inc';
 require __DIR__ . '/../src/classes/PHPMailer.php';
 
-//if ($_SESSION['access'] !== 5) {
-//    header('Location: /account/');
-//    exit;
-//}
+function handleAttachment(PHPMailer $mail)
+{
+    $targetDir = __DIR__ . '/../uploads/';
+    $fileName = basename($_FILES["attachment"]["name"]);
+    // file stored as basedir/ssmmhhDDMMYY-filename to cope with dupes
+    $targetFile = $targetDir . date('siHdmy') . '-' . $fileName;
+    $imageFileType = pathinfo($targetFile, PATHINFO_EXTENSION);
+
+    if ($_FILES['attachment']['error']) {
+        if ($_FILES['attachment']['error'] === 1) {
+            throw new Exception('File too big. Please upload a smaller file.');
+        } else {
+            throw new Exception('Something went wrong uploading your file.');
+        }
+    } else if ($imageFileType === "js" || $imageFileType === "php") {
+        throw new Exception("Sorry, this file type is not allowed.");
+    }
+
+    if (move_uploaded_file($_FILES["attachment"]["tmp_name"], $targetFile)) {
+        $mail->AddAttachment($targetFile, $fileName);
+        return $mail;
+    } else {
+        throw new Exception("Sorry, there was an error uploading your file.");
+    }
+}
+
+function sendMail(PHPMailer $mail, $email)
+{
+    if ($mail->Send()) {
+        $_SESSION['notifications']['success'][] = $email;
+    } else {
+        $_SESSION['notifications']['fail'][] = $email;
+    }
+}
 
 if (empty($_POST['subject']) || empty($_POST['message']) || empty($_POST['users'])) {
     header('Location: /account/notifications/');
@@ -51,7 +81,7 @@ foreach ($users as $user) {
     $query = $con->prepare("SELECT * FROM expenses2015 WHERE accNo = '$accNo'");
     $query->execute();
     $user['expenses'] = $query->fetch(PDO::FETCH_ASSOC);
-		
+
     $user['total'] = intval(array_sum($user['expenses']));
 
     $user['total'] = (is_int($user['total']) && $user['total'] > 0 ? number_format($user['total'], 2, '.', ',') : '&pound0.00');
@@ -203,7 +233,7 @@ foreach ($users as $user) {
 
     $Usubject = str_replace($find, $replace, $subject);
     $Umessage = str_replace($find, $replace, $message);
-		
+
     $mail = new PHPMailer();
     $mail->charSet = "UTF-8";
     $mail->IsSMTP();  // telling the class to use SMTP
@@ -214,23 +244,32 @@ foreach ($users as $user) {
     }
     $mail->Subject = $Usubject;
     $mail->Body = $Umessage;
+
     $mail->WordWrap = 78;
 
 //debug only
-    // var_dump($Umessage);
+//     var_dump($Umessage);
 // 	exit;
 
-    if ($mail->Send()) {
-        $_SESSION['notifications']['success'][] = $user['email'];
+    if ($_FILES["attachment"]["name"]) {
+        try {
+            $mail = handleAttachment($mail);
+            // doesn't try to send if attachment throws exception
+            sendMail($mail, $user['email']);
+        } catch (Exception $e) {
+            $_SESSION['notificationAttachmentError'] = $e->getMessage();
+        }
     } else {
-        $_SESSION['notifications']['fail'][] = $user['email'];
+        sendMail($mail, $user['email']);
     }
 
     $count = count($_SESSION['notifications']['success']) + count($_SESSION['notifications']['fail']);
 
     $_SESSION['notificationMessage'] = nl2br($message);
+    $_SESSION['notificationMessageAttachment'] = $_FILES["attachment"]["name"];
 
     if ($count == count($users)) {
+
         echo '<META http-equiv="refresh" content="0;URL=/account/notifications/complete">';
     }
 

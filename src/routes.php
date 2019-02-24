@@ -155,7 +155,7 @@ $app->get('/account[/]', function ($request, $response, $args) {
     $args['stats']['circles'][] = $stat->getPerformanceStatCircle('stat5', 5);
 
     $args['loggedIn'] = $_SESSION['loggedIn'];
-    $args['breadcrumbs'] = ['/'=>'Home', '/account'=>'Account'];
+    $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account'];
 
     $permissions = $_SESSION['permissions'];
     $args['user'] = $_SESSION;
@@ -183,7 +183,7 @@ $app->get('/account[/]', function ($request, $response, $args) {
         $userTiers = $limits->getTiersForUser($args['user']['id']);
 
         $args['yourstats'] = [];
-        foreach($userTiers as $tier) {
+        foreach ($userTiers as $tier) {
             $args['yourstats'][] .= $stat->getUserStatCircle('userstat' . $tier, $args['user']['accNo'], $tier);
         }
     }
@@ -207,7 +207,7 @@ $app->get('/account[/]', function ($request, $response, $args) {
         $args['promos'] = $promotions->getPromotionsforUser($args['user']['id']);
 
         $targets = $limits->getLimitsForUser($args['user']['accNo'])[0];
-        foreach($targets as $k => $target) {
+        foreach ($targets as $k => $target) {
             if (!empty($target)) {
                 $tier = substr($k, 1, 1);
                 $args['limits'][$promotions->getTierName($tier)] = $target;
@@ -221,29 +221,29 @@ $app->get('/account[/]', function ($request, $response, $args) {
 
 
 $app->get('/account/reachedTier/{tid}[/]', function ($request, $response, $args) {
-	$tierId = $args['tid'];
+    $tierId = $args['tid'];
     if (!$_SESSION['loggedIn'] || empty($_SESSION['loggedIn'])) {
         return $response->withStatus(200)->withHeader('Location', '/');
     }
-	
-	if ($_SESSION['access'] < 2 || empty($tierId)) {
-		return $response->withStatus(200)->withHeader('Location', '/account');
-	}
-	
+
+    if ($_SESSION['access'] < 2 || empty($tierId)) {
+        return $response->withStatus(200)->withHeader('Location', '/account');
+    }
+
     $user = new \Bence\User($this->db);
     $stat = new \Bence\Stat($this->db, $user->getTotalUsers());
     $breadcrumbs = new \Bence\Breadcrumbs();
     $promotions = new \Bence\Promotions($this->db);
     $limits = new \Bence\Limits($this->db);
-	
+
     $args['loggedIn'] = $_SESSION['loggedIn'];
-    $args['breadcrumbs'] = ['/'=>'Home', '/account'=>'Account', '/account/reachedTier' => 'Target Reached Users'];
+    $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account', '/account/reachedTier' => 'Target Reached Users'];
 
     $permissions = $_SESSION['permissions'];
     $args['user'] = $_SESSION;
-	$args['users'] = $user->getUsersReachedTier($tierId);
-	
-	return $this->renderer->render($response, 'reachedTier.phtml', $args);
+    $args['users'] = $user->getUsersReachedTier($tierId);
+
+    return $this->renderer->render($response, 'reachedTier.phtml', $args);
 });
 
 $app->get('/account/tier/{tid}[/]', function ($request, $response, $args) {
@@ -256,9 +256,9 @@ $app->get('/account/tier/{tid}[/]', function ($request, $response, $args) {
         $args['user'] = $_SESSION;
     }
 
-    $args['breadcrumbs'] = ['/'=>'Home'];
+    $args['breadcrumbs'] = ['/' => 'Home'];
     if ($args['loggedIn']) {
-        $args['breadcrumbs'] = ['/'=>'Home', '/account'=>'Account'];
+        $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account'];
     }
     $args['breadcrumbs']['tier'] = $promotions->getTierName($tierId);
 
@@ -284,9 +284,9 @@ $app->get('/account/promotions/{pid}[/]', function ($request, $response, $args) 
         $args['user'] = $_SESSION;
     }
 
-    $args['breadcrumbs'] = ['/'=>'Home'];
+    $args['breadcrumbs'] = ['/' => 'Home'];
     if ($args['loggedIn']) {
-        $args['breadcrumbs'] = ['/'=>'Home', '/account'=>'Account'];
+        $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account'];
     }
     if (!empty($get['uid']) && $_SESSION['access'] > 1) {
         $args['uid'] = $get['uid'];
@@ -360,31 +360,32 @@ info@bencerewards.co.uk
 
         require __DIR__ . '/classes/PHPMailer.php';
 
-	    $mail = new PHPMailer();
-	    $mail->charSet = "UTF-8";
-	    $mail->IsSMTP();  // telling the class to use SMTP
-	    $mail->Host = "mail.bencerewards.co.uk"; // SMTP server
-	    $mail->SetFrom("no-reply@bencerewards.co.uk", 'Bence Rewards');
-	    $mail->AddAddress('info@bencerewards.co.uk');
-	    $mail->Subject  = 'Promotions Booking';
-	    $mail->Body     = $adminMessage;
-	    $mail->WordWrap = 78;
+        $mail = new PHPMailer();
+        $mail->charSet = "UTF-8";
+        $mail->IsSMTP();  // telling the class to use SMTP
+        $mail->Host = "mail.bencerewards.co.uk"; // SMTP server
+        $mail->SetFrom("no-reply@bencerewards.co.uk", 'Bence Rewards');
+        $mail->AddAddress('info@bencerewards.co.uk');
+        $mail->Subject = 'Promotions Booking';
+        $mail->Body = $adminMessage;
+        $mail->WordWrap = 78;
 
-	    $Cmail = new PHPMailer();
-	    $Cmail->charSet = "UTF-8";
-	    $Cmail->IsSMTP();  // telling the class to use SMTP
-	    $Cmail->Host = "mail.bencerewards.co.uk"; // SMTP server
+        $Cmail = new PHPMailer();
+        $Cmail->charSet = "UTF-8";
+        $Cmail->IsSMTP();  // telling the class to use SMTP
+        $Cmail->Host = "mail.bencerewards.co.uk"; // SMTP server
         $Cmail->SetFrom("no-reply@bencerewards.co.uk", 'Bence Rewards Booking');
         $Cmail->AddAddress($user['email']);
-        $Cmail->Subject  = 'Bence Rewards Booking';
-        $Cmail->Body     = $customerMessage;
+        $Cmail->Subject = 'Bence Rewards Booking';
+        $Cmail->Body = $customerMessage;
         $Cmail->WordWrap = 78;
 
         $send = 'false';
+
         if (
-			$mail->Send() && 
-			$Cmail->Send()
-		) {
+            $mail->Send() &&
+            $Cmail->Send()
+        ) {
             $send = 'true';
         }
 
@@ -392,13 +393,14 @@ info@bencerewards.co.uk
             return $response->withStatus(200)->withHeader('Location', '/account?uid=' . $get['uid'] . '&promo=' . $promoId . '&success=' . $send);
         }
         return $response->withStatus(200)->withHeader('Location', '/account?promo=' . $promoId . '&success=' . $send);
+
     }
     return $response->withStatus(200)->withHeader('Location', '/account');
 });
 
 $app->get('/account/update[/]', function ($request, $response, $args) {
     $args['loggedIn'] = $_SESSION['loggedIn'];
-    $args['breadcrumbs'] = ['/'=>'Home', '/account'=>'Account', '/account/update'=>'Update'];
+    $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account', '/account/update' => 'Update'];
 
     $args['user'] = $_SESSION;
     return $this->renderer->render($response, 'user.phtml', $args);
@@ -409,7 +411,7 @@ $app->post('/account/update[/]', function ($request, $response, $args) {
     $user = new \Bence\User($this->db);
 
     $args['loggedIn'] = $_SESSION['loggedIn'];
-    $args['breadcrumbs'] = ['/'=>'Home', '/account'=>'Account', '/account/update'=>'Update'];
+    $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account', '/account/update' => 'Update'];
 
     if
     (
