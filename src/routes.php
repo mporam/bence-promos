@@ -435,7 +435,14 @@ $app->post('/account/update[/]', function ($request, $response, $args) {
 });
 
 $app->get('/account/notifications[/]', function ($request, $response, $args) {
-    $args['breadcrumbs'] = ['/' => 'Home', '/account' => 'Account', '/account/notifications' => 'Notifications'];
+    if (!$_SESSION['loggedIn'] || empty($_SESSION['loggedIn'])) {
+        return $response->withStatus(200)->withHeader('Location', '/');
+    }
+    $args['breadcrumbs'] = [
+        '/' => 'Home',
+        '/account' => 'Account',
+        '/account/notifications' => 'Notifications'
+    ];
     $args['db'] = $this->db;
     $args['loggedIn'] = $_SESSION['loggedIn'];
 
@@ -443,6 +450,9 @@ $app->get('/account/notifications[/]', function ($request, $response, $args) {
 });
 
 $app->post('/account/notifications/email[/]', function ($request, $response, $args) {
+    if (!$_SESSION['loggedIn'] || empty($_SESSION['loggedIn'])) {
+        return $response->withStatus(200)->withHeader('Location', '/');
+    }
     $args['breadcrumbs'] = [
         '/' => 'Home',
         '/account' => 'Account',
@@ -482,6 +492,11 @@ $app->get('/account/notifications/complete[/]', function ($request, $response, $
 });
 
 $app->get('/account/notifications/history[/]', function ($request, $response, $args) {
+    if (!$_SESSION['loggedIn']
+        || empty($_SESSION['loggedIn'])
+        || $_SESSION['access'] != 5) {
+        return $response->withStatus(200)->withHeader('Location', '/');
+    }
     $args['breadcrumbs'] = [
         '/' => 'Home',
         '/account' => 'Account',
