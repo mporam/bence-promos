@@ -1,20 +1,7 @@
 <?php
-require __DIR__ . '/inc/db_conn.inc';
 require __DIR__ . '/inc/header.inc';
 
-$query = $con->prepare(
-        'SELECT
-          id,
-          subject,
-          created,
-          SUM(sent_successfully) AS successful,
-          (COUNT(sent_successfully) - SUM(sent_successfully)) AS failed
-        FROM email_log JOIN email_user_sent_status ON email_id = email_log.id
-        GROUP BY id
-        ORDER BY created DESC;');
-$query->execute();
-
-$notifications = $query->fetchAll(PDO::FETCH_ASSOC);
+$notifications = $data['notifications'];
 
 $i = 0;
 $yes = 0;

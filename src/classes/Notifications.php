@@ -36,4 +36,21 @@ class Notifications
         $query->execute(array($notificationId));
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function getNotificationLog()
+    {
+        $query = $this->db->prepare(
+        'SELECT
+          id,
+          subject,
+          created,
+          SUM(sent_successfully) AS successful,
+          (COUNT(sent_successfully) - SUM(sent_successfully)) AS failed
+        FROM email_log JOIN email_user_sent_status ON email_id = email_log.id
+        GROUP BY id
+        ORDER BY created DESC;');
+        $query->execute();
+
+        return $query->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }

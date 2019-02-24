@@ -518,6 +518,10 @@ $app->get('/account/notifications/history[/]', function ($request, $response, $a
     ];
     $args['db'] = $this->db;
     $args['loggedIn'] = $_SESSION['loggedIn'];
+
+    $notifications = new \Bence\Notifications($this->db);
+    $args['notifications'] = $notifications->getNotificationLog();
+
     return $this->renderer->render($response, 'notification_history.phtml', $args);
 });
 
