@@ -454,6 +454,7 @@ $app->get('/account/notifications[/]', function ($request, $response, $args) {
 
         $args['notification'] = $promotions->getNotificationById($notificationId);
         $args['recipients'] = $promotions->getRecipientsByNotificationId($notificationId);
+        $args['breadcrumbs']['/account/notifications/history'] = 'Notification Log';
 
         return $this->renderer->render($response, '/notification.phtml', $args);
     }
